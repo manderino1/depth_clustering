@@ -69,7 +69,7 @@ void Cloud::InitProjection(const ProjectionParams& params) {
   if (_projection) {
     throw std::runtime_error("projection is already initialized");
   }
-  _projection = CloudProjection::Ptr(new SphericalProjection(params));
+  _projection = CloudProjection::Ptr(new RingProjection(params));
   if (!_projection) {
     fprintf(stderr, "ERROR: failed to initalize projection.\n");
     return;

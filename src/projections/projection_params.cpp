@@ -205,6 +205,20 @@ std::unique_ptr<ProjectionParams> ProjectionParams::HDL_64() {
   return mem_utils::make_unique<ProjectionParams>(params);
 }
 
+std::unique_ptr<ProjectionParams> ProjectionParams::LUMINAR() {
+  auto params = ProjectionParams();
+  params.SetSpan(SpanParams(-60_deg, 60_deg, 1714),
+                 SpanParams::Direction::HORIZONTAL);
+  params.SetSpan(SpanParams(10_deg, -10_deg, 128),
+                 SpanParams::Direction::VERTICAL);
+  params.FillCosSin();
+  if (!params.valid()) {
+    fprintf(stderr, "ERROR: params are not valid!\n");
+    return nullptr;
+  }
+  return mem_utils::make_unique<ProjectionParams>(params);
+}
+
 std::unique_ptr<ProjectionParams> ProjectionParams::FullSphere(
     const Radians& discretization) {
   auto params = ProjectionParams();

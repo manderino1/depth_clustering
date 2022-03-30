@@ -192,6 +192,12 @@ class ProjectionParams {
    */
   static std::unique_ptr<ProjectionParams> HDL_64_EQUAL();
   /**
+   * @brief      Parameters for Luminar Hydra
+   *
+   * @return     A pointer to parameters
+   */
+  static std::unique_ptr<ProjectionParams> LUMINAR();
+  /**
    * @brief      Default parameters for Velodyne from config file
    *
    * @return     A pointer to parameters

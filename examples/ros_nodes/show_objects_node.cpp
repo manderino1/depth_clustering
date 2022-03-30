@@ -34,6 +34,8 @@
 #include "visualization/visualizer.h"
 
 #include "tclap/CmdLine.h"
+#include "ros_bridge/cloud_ros_publisher.h"
+#include "ros_bridge/cloud_clusters_ros_publisher.h"
 
 using std::string;
 
@@ -65,7 +67,7 @@ int main(int argc, char* argv[]) {
       proj_params_ptr = ProjectionParams::VLP_16();
       break;
     case 32:
-      proj_params_ptr = ProjectionParams::HDL_32();
+      proj_params_ptr = ProjectionParams::LUMINAR();
       break;
     case 64:
       proj_params_ptr = ProjectionParams::HDL_64();
@@ -83,17 +85,17 @@ int main(int argc, char* argv[]) {
   ros::init(argc, argv, "show_objects_node");
   ros::NodeHandle nh;
 
-  string topic_clouds = "/velodyne_points";
+  string topic_clouds = "/luminar_front_points";
 
   CloudOdomRosSubscriber subscriber(&nh, *proj_params_ptr, topic_clouds);
   Visualizer visualizer;
-  visualizer.show();
+  //visualizer.show();
 
   int min_cluster_size = 20;
   int max_cluster_size = 100000;
 
   int smooth_window_size = 7;
-  Radians ground_remove_angle = 7_deg;
+  Radians ground_remove_angle = 25_deg;
 
   auto depth_ground_remover = DepthGroundRemover(
       *proj_params_ptr, ground_remove_angle, smooth_window_size);
@@ -101,9 +103,15 @@ int main(int argc, char* argv[]) {
   ClustererT clusterer(angle_tollerance, min_cluster_size, max_cluster_size);
   clusterer.SetDiffType(DiffFactory::DiffType::ANGLES);
 
+  // Create publisher for ground removed cloud, clustered cloud
+  CloudRosPublisher cloud_publisher(&nh, "luminar_front", "luminar_front_points/ground_removed");
+  CloudClusterRosPublisher publisher_clusters(&nh, "luminar_front", "luminar_front_points/clusters");
+
   subscriber.AddClient(&depth_ground_remover);
   depth_ground_remover.AddClient(&clusterer);
+  depth_ground_remover.AddClient(&cloud_publisher);
   clusterer.AddClient(visualizer.object_clouds_client());
+  clusterer.AddClient(&publisher_clusters);
   subscriber.AddClient(&visualizer);
 
   fprintf(stderr, "INFO: Running with angle tollerance: %f degrees\n",
