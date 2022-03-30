@@ -53,8 +53,9 @@ void DepthGroundRemover::OnNewObjectReceived(const Cloud& cloud, const int) {
   Timer total_timer;
   auto angle_image = CreateAngleImage(depth_image);
   auto smoothed_image = ApplySavitskyGolaySmoothing(angle_image, _window_size);
-  auto no_ground_image = ZeroOutGroundBFS(depth_image, smoothed_image,
-                                          _ground_remove_angle, _window_size);
+  //auto no_ground_image = ZeroOutGroundBFS(depth_image, smoothed_image,
+  //                                        _ground_remove_angle, _window_size);
+  auto no_ground_image = ZeroOutGround(depth_image, smoothed_image, _ground_remove_angle);
   fprintf(stderr, "INFO: Ground removed in %lu us\n", total_timer.measure());
   cloud_copy.projection_ptr()->depth_image() = no_ground_image;
   this->ShareDataWithAllClients(cloud_copy);
