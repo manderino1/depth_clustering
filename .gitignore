@@ -30,3 +30,44 @@
 /doc/latex/
 
 notebooks/.ipynb_checkpoints/*
+
+# Ignore catkin generated folders
+devel/
+devel/*
+build/
+build/*
+logs/
+logs/*
+.rosinstall
+.rosinstall.bak
+cmake-build-debug
+cmake-build-release
+
+# Ignore all Rosbags
+**.bag
+
+# Others
+.idea/
+.idea/*
+cmake-build-debug/
+cmake-build-debug/*
+cmake-build-release/
+cmake-build-release/*
+cmake-build-debug-coverage/
+cmake-build-debug-coverage/*
+clion/
+clion-cmake/
+clion-cmake/*
+
+# Catkin stuff
+.catkin_tools/*
+.catkin_tools/
+
+**.swp
+
+# binary files
+**.pyc
+
+# Profiler files
+**.prof
+.vscode/*
