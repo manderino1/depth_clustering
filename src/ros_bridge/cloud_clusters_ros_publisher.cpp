@@ -27,7 +27,6 @@ void CloudClusterRosPublisher::ImageToPcl(const std::unordered_map<uint16_t, Clo
       p.y = point.y();
       p.z = point.z();
       p.label = kv.first; // it was i, but more usefull kv.first for debuging reasons
-      std::cout << kv.first << std::endl;
       pcl_temp.push_back(p);
     }
     pcl::getMinMax3D(pcl_temp, min_p, max_p);
