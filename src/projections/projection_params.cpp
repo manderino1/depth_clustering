@@ -209,7 +209,7 @@ std::unique_ptr<ProjectionParams> ProjectionParams::LUMINAR() {
   auto params = ProjectionParams();
   params.SetSpan(SpanParams(-60_deg, 60_deg, 1714),
                  SpanParams::Direction::HORIZONTAL);
-  params.SetSpan(SpanParams(10_deg, -10_deg, 128),
+  params.SetSpan(SpanParams(5.5_deg, -6_deg, 64),
                  SpanParams::Direction::VERTICAL);
   params.FillCosSin();
   if (!params.valid()) {

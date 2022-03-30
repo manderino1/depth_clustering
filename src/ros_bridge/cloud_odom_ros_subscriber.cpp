@@ -159,7 +159,47 @@ Cloud::Ptr CloudOdomRosSubscriber::RosCloudToCloud(
     cloud.push_back(point);
   }
 
-  return make_shared<Cloud>(cloud);
+  int min_ring = cloud.points().front().ring();
+  int max_ring = cloud.points().back().ring();
+
+  // TODO(marco): this is inefficient, do this in a single step with the previous loop
+  Cloud cloud_realigned;
+  for(auto &point : cloud.points()) {
+    RichPoint new_point = point;
+
+    // TODO(marco): assuming that first point is in the first layer, last point in last, search for this correctly
+    if(min_ring < max_ring) {
+      if(point.ring() < min_ring || point.ring() > max_ring) {
+        continue;
+      }
+    } else {
+      if(point.ring() < min_ring && point.ring() > max_ring) {
+        continue;
+      }
+    }
+
+    // Calculate the new ring
+    if(min_ring < max_ring) { // Rings are in order between 0 and 128
+      new_point.ring() = point.ring() - min_ring;
+    } else { // Points get to 127 and back from 0
+      if(point.ring() >= min_ring) { // Between min and 127
+        new_point.ring() = point.ring() - min_ring;
+      } else { // Between 0 and max
+        new_point.ring() = point.ring() + (128-min_ring);
+      }
+    }
+
+    // TODO(marco): this condition should never be met but happens because number of layers are not constant
+    // We are anyway making an error because we assign ring to range image not based on pitch but on first point in first layer and 64 total assumption
+    // Solution should be doing a dynamic range image with variable number of rings and known pitch for each for reprojection
+    if(new_point.ring() >=64) {
+      continue;
+    }
+
+    cloud_realigned.push_back(new_point);
+  }
+
+  return make_shared<Cloud>(cloud_realigned);
 }
 
 }  // namespace depth_clustering
