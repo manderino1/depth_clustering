@@ -37,6 +37,7 @@
 #include "projections/cloud_projection.h"
 #include "projections/ring_projection.h"
 #include "projections/spherical_projection.h"
+#include "projections/luminar_projection.h"
 #include "utils/pose.h"
 #include "utils/useful_typedefs.h"
 
