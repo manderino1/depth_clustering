@@ -83,6 +83,9 @@ class Cloud {
   inline void Resize(size_t new_size) { _points.resize(new_size); }
   inline void SetPose(const Pose& pose) { _pose = pose; }
 
+  inline void SetFrameId(const std::string& frame_id) { _frame_id = frame_id; }
+  inline std::string frame_id() const { return _frame_id; }
+
   inline const typename CloudProjection::ConstPtr projection_ptr() const {
     return _projection;
   }
@@ -120,6 +123,7 @@ class Cloud {
 
  protected:
   RichPoint::AlignedVector _points;
+  std::string _frame_id;
 
   Pose _pose;
   Pose _sensor_pose;

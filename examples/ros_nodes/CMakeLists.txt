@@ -32,6 +32,19 @@ target_link_libraries(show_objects_node
                       ${PCL_LIBRARIES}
                       ${CMAKE_THREAD_LIBS_INIT})
 
+add_executable(show_objects_multiple_node show_objects_multiple_node.cpp)
+target_link_libraries(show_objects_multiple_node
+        ros_bridge
+        image_labeler
+        projections
+        ground_remove
+        visualization
+        ${MY_QT_LIBRARIES}
+        ${Boost_LIBRARIES}
+        ${catkin_LIBRARIES}
+        ${PCL_LIBRARIES}
+        ${CMAKE_THREAD_LIBS_INIT})
+
 if (${PCL_FOUND})
   add_executable(save_clusters_node save_clusters_node.cpp)
   target_link_libraries(save_clusters_node

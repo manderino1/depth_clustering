@@ -59,6 +59,7 @@ void DepthGroundRemover::OnNewObjectReceived(const Cloud& cloud, const int) {
   auto no_ground_image = ZeroOutGround(depth_image, angle_image, _ground_remove_angle);
   fprintf(stderr, "INFO: Ground removed in %lu us\n", total_timer.measure());
   cloud_copy.projection_ptr()->depth_image() = no_ground_image;
+  cloud_copy.SetFrameId(cloud.frame_id()); // Copy frame id
   this->ShareDataWithAllClients(cloud_copy);
   _counter++;
 }

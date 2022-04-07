@@ -123,6 +123,7 @@ typename pcl::PointCloud<pcl::PointXYZL>::Ptr Cloud::ToPcl() const {
   using pcl::PointXYZL;
   using PclCloud = pcl::PointCloud<PointXYZL>;
   PclCloud pcl_cloud;
+  pcl_cloud.header.frame_id = _frame_id;
   for (const auto& point : _points) {
     PointXYZL pcl_point;
     pcl_point.x = point.x();

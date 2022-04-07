@@ -120,6 +120,8 @@ find_package(catkin COMPONENTS
   message_filters
   tf
   eigen_conversions
+  pcl_ros
+  tf2_ros
 )
 
 # add some useful constants to configuration
