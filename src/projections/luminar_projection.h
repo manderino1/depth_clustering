@@ -41,6 +41,7 @@ class LuminarProjection : public CloudProjection {
       : CloudProjection(params) {
     depth_image_indexes_ =
         cv::Mat::zeros(_params.rows(), _params.cols(), cv::DataType<int>::type);
+    depth_image_indexes_.setTo(-1);
   }
 
   /**

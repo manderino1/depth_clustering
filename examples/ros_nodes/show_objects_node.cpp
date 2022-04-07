@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
   int max_cluster_size = 100000;
 
   int smooth_window_size = 7;
-  Radians ground_remove_angle = 25_deg;
+  Radians ground_remove_angle = 18_deg;
 
   auto depth_ground_remover = DepthGroundRemover(
       *proj_params_ptr, ground_remove_angle, smooth_window_size);

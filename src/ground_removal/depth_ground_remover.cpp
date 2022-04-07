@@ -51,11 +51,12 @@ void DepthGroundRemover::OnNewObjectReceived(const Cloud& cloud, const int) {
   const cv::Mat& depth_image =
       RepairDepth(cloud.projection_ptr()->depth_image(), 5, 1.0f);
   Timer total_timer;
-  auto angle_image = CreateAngleImage(depth_image);
+  auto angle_image = CreateAngleImageLuminar(depth_image, cloud);
   auto smoothed_image = ApplySavitskyGolaySmoothing(angle_image, _window_size);
   //auto no_ground_image = ZeroOutGroundBFS(depth_image, smoothed_image,
   //                                        _ground_remove_angle, _window_size);
-  auto no_ground_image = ZeroOutGround(depth_image, smoothed_image, _ground_remove_angle);
+  // Not using smoothing kernel
+  auto no_ground_image = ZeroOutGround(depth_image, angle_image, _ground_remove_angle);
   fprintf(stderr, "INFO: Ground removed in %lu us\n", total_timer.measure());
   cloud_copy.projection_ptr()->depth_image() = no_ground_image;
   this->ShareDataWithAllClients(cloud_copy);
@@ -186,6 +187,36 @@ Mat DepthGroundRemover::CreateAngleImage(const Mat& depth_image) {
       dx = fabs(x_mat.at<float>(r, c) - x_mat.at<float>(r - 1, c));
       dy = fabs(y_mat.at<float>(r, c) - y_mat.at<float>(r - 1, c));
       angle_image.at<float>(r, c) = atan2(dy, dx);
+    }
+  }
+  return angle_image;
+}
+
+Mat DepthGroundRemover::CreateAngleImageLuminar(const Mat& depth_image, const Cloud& cloud) {
+  Mat angle_image = Mat::zeros(depth_image.size(), DataType<float>::type);
+  Mat x_mat = Mat::zeros(depth_image.size(), DataType<float>::type);
+  Mat y_mat = Mat::zeros(depth_image.size(), DataType<float>::type);
+
+  // Get projection for indices
+  auto projection_luminar = dynamic_cast<const LuminarProjection&>(*(cloud.projection_ptr()));
+
+  float dx, dy;
+  for (int r = 1; r < angle_image.rows; ++r) {
+    for (int c = 0; c < angle_image.cols; ++c) {
+      // Get original points in cylindrical coordinates
+      RichPoint point_1 = cloud.at(projection_luminar.depth_image_indexes().at<int>(r-1, c));
+      RichPoint point_2 = cloud.at(projection_luminar.depth_image_indexes().at<int>(r, c));
+
+      dx = point_2.DistToSensor2D() - point_1.DistToSensor2D();
+      dy = point_2.z() - point_1.z();
+
+      angle_image.at<float>(r, c) = atan2(dy, dx);
+
+      // Calculating angle only between consecutive layers
+      if(projection_luminar.depth_image_indexes().at<int>(r-1, c) == -1 ||
+          projection_luminar.depth_image_indexes().at<int>(r, c) == -1) {
+        angle_image.at<float>(r, c) = -1;
+      }
     }
   }
   return angle_image;

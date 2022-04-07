@@ -180,19 +180,20 @@ Cloud::Ptr CloudOdomRosSubscriber::RosCloudToCloud(
 
     // Calculate the new ring
     if(min_ring < max_ring) { // Rings are in order between 0 and 128
-      new_point.ring() = point.ring() - min_ring;
+      new_point.ring() = 33-(point.ring() - min_ring)/2;
     } else { // Points get to 127 and back from 0
       if(point.ring() >= min_ring) { // Between min and 127
-        new_point.ring() = point.ring() - min_ring;
+        new_point.ring() = 33-(point.ring() - min_ring)/2;
       } else { // Between 0 and max
-        new_point.ring() = point.ring() + (128-min_ring);
+        new_point.ring() = 33-(point.ring() + (128-min_ring))/2;
       }
     }
 
     // TODO(marco): this condition should never be met but happens because number of layers are not constant
     // We are anyway making an error because we assign ring to range image not based on pitch but on first point in first layer and 64 total assumption
     // Solution should be doing a dynamic range image with variable number of rings and known pitch for each for reprojection
-    if(new_point.ring() >=64) {
+    if(new_point.ring() >=34 || new_point.ring() < 0) {
+      std::cout << new_point.ring() << std::endl;
       continue;
     }
 

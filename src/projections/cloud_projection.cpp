@@ -48,6 +48,7 @@ RichPoint CloudProjection::UnprojectPoint(const cv::Mat& image, const int row,
   RichPoint point{depth * cosf(angle_z.val()) * cosf(angle_xy.val()),
                   depth * cosf(angle_z.val()) * sinf(angle_xy.val()),
                   depth * sinf(angle_z.val())};
+  point.ring() = row;
   return point;
 }
 

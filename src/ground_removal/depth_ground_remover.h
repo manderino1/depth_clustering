@@ -94,6 +94,17 @@ class DepthGroundRemover : public AbstractClient<Cloud>,
   cv::Mat CreateAngleImage(const cv::Mat& depth_image);
 
   /**
+   * @brief      create a help image with angle in radians written for each
+   *             pixel
+   *
+   * @param      depth_image  [input depth image]
+   * @param      cloud [input cloud]
+   * @return     [32 bit float image with angle in radians written in every
+   *             pixel]
+   */
+  cv::Mat CreateAngleImageLuminar(const cv::Mat& depth_image, const Cloud& cloud);
+
+  /**
    * @brief      Get kernel for Savitsky-Golay filter
    * @details    Get a column filter to process an image filled with data with
    *             Savitsky-Golay filter
