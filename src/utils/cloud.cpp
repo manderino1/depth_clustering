@@ -69,7 +69,7 @@ void Cloud::InitProjection(const ProjectionParams& params) {
   if (_projection) {
     throw std::runtime_error("projection is already initialized");
   }
-  _projection = CloudProjection::Ptr(new LuminarProjection(params));
+  _projection = LuminarProjection::Ptr(new LuminarProjection(params));
   if (!_projection) {
     fprintf(stderr, "ERROR: failed to initalize projection.\n");
     return;
@@ -80,7 +80,7 @@ void Cloud::InitProjection(const ProjectionParams& params) {
 
 Cloud::Ptr Cloud::FromImage(const cv::Mat& image,
                             const ProjectionParams& params) {
-  CloudProjection::Ptr proj = CloudProjection::Ptr(new RingProjection(params));
+  CloudProjection::Ptr proj = CloudProjection::Ptr(new LuminarProjection(params));
   proj->CheckImageAndStorage(image);
   proj->CloneDepthImage(image);
   Cloud cloud;
@@ -95,6 +95,23 @@ Cloud::Ptr Cloud::FromImage(const cv::Mat& image,
     }
   }
   cloud.SetProjectionPtr(proj);
+  // we cannot share ownership of this cloud with others, so create a new one
+  return boost::make_shared<Cloud>(cloud);
+}
+
+Cloud::Ptr Cloud::FromImageLuminar(const cv::Mat& image) const {
+  auto projection_luminar = dynamic_cast<LuminarProjection&>(*_projection);
+  Cloud cloud;
+  for (int r = 0; r < image.rows; ++r) {
+    for (int c = 0; c < image.cols; ++c) {
+      if (image.at<float>(r, c) < 0.0001f) {
+        continue;
+      }
+      // Point is present, add it to the cloud
+      RichPoint point = this->at(projection_luminar.depth_image_indexes().at<int>(r,c));
+      cloud.push_back(point);
+    }
+  }
   // we cannot share ownership of this cloud with others, so create a new one
   return boost::make_shared<Cloud>(cloud);
 }

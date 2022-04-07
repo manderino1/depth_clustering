@@ -98,6 +98,8 @@ class Cloud {
 
   void InitProjection(const ProjectionParams& params);
 
+  Cloud::Ptr FromImageLuminar(const cv::Mat& image) const;
+
   static Cloud::Ptr FromImage(const cv::Mat& image,
                               const ProjectionParams& params);
 

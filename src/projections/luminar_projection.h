@@ -52,6 +52,8 @@ class LuminarProjection : public CloudProjection {
   CloudProjection::Ptr Clone() const override;
   virtual ~LuminarProjection() {}
 
+  cv::Mat& depth_image_indexes();
+
  protected:
   RichPoint UnprojectPoint(const cv::Mat& image, const int row,
                            const int col) const override;

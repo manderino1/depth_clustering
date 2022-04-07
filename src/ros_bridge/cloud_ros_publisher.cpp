@@ -12,7 +12,7 @@ void CloudRosPublisher::OnNewObjectReceived(const Cloud& cloud, const int id){
   //PointCloudT plc_cloud;
   //ImageToPcl(clouds, plc_cloud);
   PointCloudT pcl_temp;
-  auto cloud_ground_removed = Cloud::FromImage(cloud.projection_ptr()->depth_image(), cloud.projection_ptr()->params());
+  auto cloud_ground_removed = cloud.FromImageLuminar(cloud.projection_ptr()->depth_image());
   //PublishCloud(*(cloud.ToPcl()));
   PublishCloud(*cloud_ground_removed->ToPcl());
 }
