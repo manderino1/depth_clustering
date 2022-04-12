@@ -56,7 +56,7 @@ void DepthGroundRemover::OnNewObjectReceived(const Cloud& cloud, const int) {
   //auto no_ground_image = ZeroOutGroundBFS(depth_image, smoothed_image,
   //                                        _ground_remove_angle, _window_size);
   // Not using smoothing kernel
-  auto no_ground_image = ZeroOutGround(depth_image, angle_image, _ground_remove_angle);
+  auto no_ground_image = ZeroOutGround(depth_image, smoothed_image, _ground_remove_angle);
   fprintf(stderr, "INFO: Ground removed in %lu us\n", total_timer.measure());
   cloud_copy.projection_ptr()->depth_image() = no_ground_image;
   cloud_copy.SetFrameId(cloud.frame_id()); // Copy frame id
@@ -205,22 +205,81 @@ Mat DepthGroundRemover::CreateAngleImageLuminar(const Mat& depth_image, const Cl
   for (int r = 1; r < angle_image.rows; ++r) {
     for (int c = 0; c < angle_image.cols; ++c) {
       // Get original points in cylindrical coordinates
-      RichPoint point_1 = cloud.at(projection_luminar.depth_image_indexes().at<int>(r-1, c));
-      RichPoint point_2 = cloud.at(projection_luminar.depth_image_indexes().at<int>(r, c));
+      int index_1 = projection_luminar.depth_image_indexes().at<int>(r-1, c);
+      int index_2 = projection_luminar.depth_image_indexes().at<int>(r, c);
 
-      dx = point_2.DistToSensor2D() - point_1.DistToSensor2D();
-      dy = point_2.z() - point_1.z();
+      RichPoint point_1 = cloud.at(index_1);
+      RichPoint point_2 = cloud.at(index_2);
+
+      // Calculate pitch angle from cartesian coordinates
+      float pitch_1 = M_PI/2 - atan2(sqrt(pow(point_1.x(),2) + pow(point_1.y(),2)), point_1.z());
+      float pitch_2 = M_PI/2 - atan2(sqrt(pow(point_2.x(),2) + pow(point_2.y(),2)), point_2.z());
+
+      // If point is empty, interpolate on row
+      if(index_1 == -1) {
+        float pitch = InterpolatePitch(r-1, c, angle_image.cols, &projection_luminar, cloud);
+        if(!isnan(pitch)) {
+          pitch_1 = pitch;
+        }
+      }
+
+      if(index_2 == -1) {
+        float pitch = InterpolatePitch(r, c, angle_image.cols, &projection_luminar, cloud);
+        if(!isnan(pitch)) {
+          pitch_2 = pitch;
+        }
+      }
+
+      // Calculate projections
+      float x_1 = depth_image.at<float>(r-1, c) * cos(pitch_1);
+      float y_1 = depth_image.at<float>(r-1, c) * sin(pitch_1);
+      float x_2 = depth_image.at<float>(r, c) * cos(pitch_2);
+      float y_2 = depth_image.at<float>(r, c) * sin(pitch_2);
+
+      dx = fabs(x_2 - x_1);
+      dy = fabs(y_2 - y_1);
 
       angle_image.at<float>(r, c) = atan2(dy, dx);
-
-      // Calculating angle only between consecutive layers
-      if(projection_luminar.depth_image_indexes().at<int>(r-1, c) == -1 ||
-          projection_luminar.depth_image_indexes().at<int>(r, c) == -1) {
-        angle_image.at<float>(r, c) = -1;
-      }
     }
   }
   return angle_image;
+}
+
+float DepthGroundRemover::InterpolatePitch(int row, int col, int image_cols, LuminarProjection *projection, const Cloud &cloud) {
+  // Search first filled point on the left
+  float pitch_left = NAN;
+  int col_left = -1;
+  for(int i=col; i>=0; i--) {
+    int index = projection->depth_image_indexes().at<int>(row, i);
+    if(index != -1) {
+      RichPoint point_left = cloud.at(index);
+      col_left = i;
+      pitch_left = M_PI/2 - atan2(sqrt(pow(point_left.x(),2) + pow(point_left.y(),2)), point_left.z());
+      break;
+    }
+  }
+
+  // Search first filled point on the right
+  float pitch_right = NAN;
+  int col_right = -1;
+  for(int i=col; i<image_cols; i++) {
+    int index = projection->depth_image_indexes().at<int>(row, i);
+    if(index != -1) {
+      RichPoint point_left = cloud.at(index);
+      col_right = i;
+      pitch_right = M_PI/2 - atan2(sqrt(pow(point_left.x(),2) + pow(point_left.y(),2)), point_left.z());
+      break;
+    }
+  }
+
+  // If both were found interpolate
+  if(col_left != -1 && col_right != -1) {
+    float percentage_left = float(abs(col - col_left))/float((abs(col - col_left) + abs(col - col_right)));
+    float percentage_right = 1-percentage_left;
+    return(pitch_left*percentage_left + pitch_right*percentage_right);
+  } else {
+    return(NAN);
+  }
 }
 
 Mat DepthGroundRemover::GetSavitskyGolayKernel(int window_size) const {

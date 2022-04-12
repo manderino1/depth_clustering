@@ -105,6 +105,17 @@ class DepthGroundRemover : public AbstractClient<Cloud>,
   cv::Mat CreateAngleImageLuminar(const cv::Mat& depth_image, const Cloud& cloud);
 
   /**
+   * @brief Find closest point on left and right on the same row and interpolate the pitch
+   * @param row range image row
+   * @param col range image column
+   * @param image_cols number of columns of the range image
+   * @param projection data of the range image projection, including mapping of pixels to cloud
+   * @param cloud original point cloud reference
+   * @return pitch value if found, nan if not found
+   */
+  float InterpolatePitch(int row, int col, int image_cols, LuminarProjection *projection, const Cloud &cloud);
+
+  /**
    * @brief      Get kernel for Savitsky-Golay filter
    * @details    Get a column filter to process an image filled with data with
    *             Savitsky-Golay filter
