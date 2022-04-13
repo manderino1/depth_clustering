@@ -26,8 +26,8 @@
 
 namespace depth_clustering {
 
-cv::Mat& LuminarProjection::depth_image_indexes() { return this->depth_image_indexes_; }
-cv::Mat& LuminarProjection::depth_image_pitch() { return this->depth_image_pitch_; }
+cv::Mat& LuminarProjection::depth_image_indexes() { return depth_image_indexes_; }
+cv::Mat& LuminarProjection::depth_image_pitch() { return depth_image_pitch_; }
 
 void LuminarProjection::InitFromPoints(const RichPoint::AlignedVector& points) {
   fprintf(stderr, "Projecting cloud with %lu points\n", points.size());

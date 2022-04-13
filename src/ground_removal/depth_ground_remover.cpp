@@ -199,14 +199,14 @@ Mat DepthGroundRemover::CreateAngleImageLuminar(const Mat& depth_image, const Cl
   Mat y_mat = Mat::zeros(depth_image.size(), DataType<float>::type);
 
   // Get projection for indices
-  auto projection_luminar = dynamic_cast<const LuminarProjection&>(*(cloud.projection_ptr()));
+  auto projection_luminar = dynamic_cast<const LuminarProjection*>(cloud.projection_c_ptr());
 
   float dx, dy;
   for (int r = 1; r < angle_image.rows; ++r) {
     for (int c = 0; c < angle_image.cols; ++c) {
       // Calculate pitch angle from cartesian coordinates
-      float pitch_1 = projection_luminar.depth_image_pitch().at<float>(r-1, c);
-      float pitch_2 = projection_luminar.depth_image_pitch().at<float>(r, c);
+      float pitch_1 = projection_luminar->depth_image_pitch_ptr()->at<float>(r-1, c);
+      float pitch_2 = projection_luminar->depth_image_pitch_ptr()->at<float>(r, c);
 
       // Calculate projections
       float x_1 = depth_image.at<float>(r-1, c) * cos(pitch_1);

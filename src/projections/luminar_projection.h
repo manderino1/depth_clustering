@@ -60,6 +60,14 @@ class LuminarProjection : public CloudProjection {
   cv::Mat& depth_image_indexes();
   cv::Mat& depth_image_pitch();
 
+  inline const cv::Mat* depth_image_indexes_ptr() const {
+    return &depth_image_indexes_;
+  }
+
+  inline const cv::Mat* depth_image_pitch_ptr() const {
+    return &depth_image_pitch_;
+  }
+
  protected:
   RichPoint UnprojectPoint(const cv::Mat& image, const int row,
                            const int col) const override;

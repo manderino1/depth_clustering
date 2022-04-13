@@ -90,6 +90,10 @@ class Cloud {
     return _projection;
   }
 
+  inline const CloudProjection* projection_c_ptr() const {
+    return &(*_projection);
+  }
+
   inline typename CloudProjection::Ptr projection_ptr() { return _projection; }
 
   std::list<const RichPoint*> PointsProjectedToPixel(int row, int col) const;
