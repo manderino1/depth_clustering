@@ -144,6 +144,9 @@ Cloud::Ptr CloudOdomRosSubscriber::RosCloudToCloud(
   uint32_t z_offset = msg->fields[2].offset;
   uint32_t ring_offset = msg->fields[4].offset;
 
+  // Initialize all ring numbers to not found
+  bool ring_present[128] = {false};
+
   Cloud cloud;
   for (uint32_t point_start_byte = 0, counter = 0;
        point_start_byte < msg->data.size();
@@ -155,19 +158,54 @@ Cloud::Ptr CloudOdomRosSubscriber::RosCloudToCloud(
     //point.ring() = BytesTo<uint16_t>(msg->data, point_start_byte + ring_offset);
     point.ring() = BytesTo<float>(msg->data, point_start_byte + ring_offset);
 
+    ring_present[point.ring()] = true;
+
     // point.z *= -1;  // hack
     cloud.push_back(point);
   }
 
-  int min_ring = cloud.points().front().ring();
-  int max_ring = cloud.points().back().ring();
+  // Find if both last & first are present, if yes there is a jump
+  int min_ring = 0;
+  int max_ring = 127;
+  if(ring_present[0] && ring_present[127]) {
+    // Jump is present, find first and last
+    // Find max ring
+    for(int i=0; i<128; i++) {
+      if(!ring_present[i]) {
+        max_ring = i-1;
+        break;
+      }
+    }
+    // Find min ring
+    for(int i=127; i>=0; i--) {
+      if(!ring_present[i]) {
+        min_ring = i+1;
+        break;
+      }
+    }
+  } else {
+    // No jump, find first and last
+    bool min_found = false;
+    for(int i=0; i<128; i++) {
+      if(!min_found) {
+        if(ring_present[i]) {
+          min_ring = i;
+          min_found = true;
+        }
+      } else {
+        if(!ring_present[i]) {
+          max_ring = i-1;
+          break;
+        }
+      }
+    }
+  }
 
   // TODO(marco): this is inefficient, do this in a single step with the previous loop
   Cloud cloud_realigned;
   for(auto &point : cloud.points()) {
     RichPoint new_point = point;
-
-    // TODO(marco): assuming that first point is in the first layer, last point in last, search for this correctly
+    
     if(min_ring < max_ring) {
       if(point.ring() < min_ring || point.ring() > max_ring) {
         continue;
@@ -190,9 +228,7 @@ Cloud::Ptr CloudOdomRosSubscriber::RosCloudToCloud(
     }
 
     // TODO(marco): this condition should never be met but happens because number of layers are not constant
-    // We are anyway making an error because we assign ring to range image not based on pitch but on first point in first layer and 64 total assumption
-    // Solution should be doing a dynamic range image with variable number of rings and known pitch for each for reprojection
-    if(new_point.ring() >=34 || new_point.ring() < 0) {
+    if(new_point.ring() >=34) {
       std::cout << new_point.ring() << std::endl;
       continue;
     }
