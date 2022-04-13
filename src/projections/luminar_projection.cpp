@@ -27,6 +27,7 @@
 namespace depth_clustering {
 
 cv::Mat& LuminarProjection::depth_image_indexes() { return this->depth_image_indexes_; }
+cv::Mat& LuminarProjection::depth_image_pitch() { return this->depth_image_pitch_; }
 
 void LuminarProjection::InitFromPoints(const RichPoint::AlignedVector& points) {
   fprintf(stderr, "Projecting cloud with %lu points\n", points.size());
@@ -53,6 +54,8 @@ void LuminarProjection::InitFromPoints(const RichPoint::AlignedVector& points) {
       this->depth_image_indexes_.at<int>(bin_rows, bin_cols) = static_cast<int>(index);
     }
   }
+
+  calculatePitch(points);
   fprintf(stderr, "Cloud projected in %lu us\n", timer.measure());
 }
 
@@ -65,6 +68,61 @@ RichPoint LuminarProjection::UnprojectPoint(const cv::Mat& image, const int row,
   RichPoint point = CloudProjection::UnprojectPoint(image, row, col);
   point.ring() = row;
   return point;
+}
+
+void LuminarProjection::calculatePitch(const RichPoint::AlignedVector& points) {
+  for (int r = 0; r < _depth_image.rows; ++r) {
+    for (int c = 0; c < _depth_image.cols; ++c) {
+      int index = this->depth_image_indexes().at<int>(r, c);
+      if(index != -1) {
+        // If cell is full fill with its pitch
+        RichPoint point = points.at(index);
+        float pitch = M_PI/2 - atan2(sqrt(pow(point.x(),2) + pow(point.y(),2)), point.z());
+        this->depth_image_pitch_.at<float>(r,c) = pitch;
+      } else {
+        // If cell is empty interpolate pitch
+        float pitch = interpolatePitch(r, c, _depth_image.cols, points);
+        this->depth_image_pitch_.at<float>(r,c) = pitch;
+      }
+    }
+  }
+}
+
+float LuminarProjection::interpolatePitch(int row, int col, int image_cols, const RichPoint::AlignedVector& points) {
+  // Search first filled point on the left
+  float pitch_left = NAN;
+  int col_left = -1;
+  for(int i=col; i>=0; i--) {
+    int index = this->depth_image_indexes().at<int>(row, i);
+    if(index != -1) {
+      RichPoint point_left = points.at(index);
+      col_left = i;
+      pitch_left = M_PI/2 - atan2(sqrt(pow(point_left.x(),2) + pow(point_left.y(),2)), point_left.z());
+      break;
+    }
+  }
+
+  // Search first filled point on the right
+  float pitch_right = NAN;
+  int col_right = -1;
+  for(int i=col; i<image_cols; i++) {
+    int index = this->depth_image_indexes().at<int>(row, i);
+    if(index != -1) {
+      RichPoint point_left = points.at(index);
+      col_right = i;
+      pitch_right = M_PI/2 - atan2(sqrt(pow(point_left.x(),2) + pow(point_left.y(),2)), point_left.z());
+      break;
+    }
+  }
+
+  // If both were found interpolate
+  if(col_left != -1 && col_right != -1) {
+    float percentage_left = float(abs(col - col_left))/float((abs(col - col_left) + abs(col - col_right)));
+    float percentage_right = 1-percentage_left;
+    return(pitch_left*percentage_left + pitch_right*percentage_right);
+  } else {
+    return(NAN);
+  }
 }
 
 }  // namespace depth_clustering

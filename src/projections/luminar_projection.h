@@ -42,6 +42,10 @@ class LuminarProjection : public CloudProjection {
     depth_image_indexes_ =
         cv::Mat::zeros(_params.rows(), _params.cols(), cv::DataType<int>::type);
     depth_image_indexes_.setTo(-1);
+
+    depth_image_pitch_ =
+        cv::Mat::zeros(_params.rows(), _params.cols(), cv::DataType<float>::type);
+    depth_image_pitch_.setTo(-170);
   }
 
   /**
@@ -54,12 +58,30 @@ class LuminarProjection : public CloudProjection {
   virtual ~LuminarProjection() {}
 
   cv::Mat& depth_image_indexes();
+  cv::Mat& depth_image_pitch();
 
  protected:
   RichPoint UnprojectPoint(const cv::Mat& image, const int row,
                            const int col) const override;
 
+  /**
+   * @bried calculates pitch angle for each point of the cloud, attempts to fill if not present
+   * @param points original point cloud reference
+   */
+  void calculatePitch(const RichPoint::AlignedVector& points);
+
+  /**
+   * @brief Find closest point on left and right on the same row and interpolate the pitch
+   * @param row range image row
+   * @param col range image column
+   * @param image_cols number of columns of the range image
+   * @param points original point cloud reference
+   * @return pitch value if found, nan if not found
+   */
+  float interpolatePitch(int row, int col, int image_cols, const RichPoint::AlignedVector& points);
+
   cv::Mat depth_image_indexes_;
+  cv::Mat depth_image_pitch_;
 };
 
 }  // namespace depth_clustering
