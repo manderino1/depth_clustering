@@ -45,7 +45,7 @@ class LuminarProjection : public CloudProjection {
 
     depth_image_pitch_ =
         cv::Mat::zeros(_params.rows(), _params.cols(), cv::DataType<float>::type);
-    depth_image_pitch_.setTo(-170);
+    depth_image_pitch_.setTo(NAN);
   }
 
   /**

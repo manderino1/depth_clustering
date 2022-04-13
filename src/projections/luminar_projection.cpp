@@ -81,6 +81,12 @@ void LuminarProjection::calculatePitch(const RichPoint::AlignedVector& points) {
         this->depth_image_pitch_.at<float>(r,c) = pitch;
       } else {
         // If cell is empty interpolate pitch
+
+        // Moving left to right, so if cell to the left has no pitch this will have no pitch
+        if(c == 0 || isnan(this->depth_image_pitch_.at<float>(r,c-1))) {
+          continue;
+        }
+
         float pitch = interpolatePitch(r, c, _depth_image.cols, points);
         this->depth_image_pitch_.at<float>(r,c) = pitch;
       }
