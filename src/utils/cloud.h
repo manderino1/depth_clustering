@@ -27,7 +27,10 @@
 #if PCL_FOUND
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
+#include <pcl_conversions/pcl_conversions.h>
 #endif  // PCL_FOUND
+
+#include <ros/time.h>
 
 #include <algorithm>
 #include <list>
@@ -86,6 +89,9 @@ class Cloud {
   inline void SetFrameId(const std::string& frame_id) { _frame_id = frame_id; }
   inline std::string frame_id() const { return _frame_id; }
 
+  inline void SetTimeStamp(const ros::Time& time_stamp) { time_stamp_ = time_stamp; }
+  inline ros::Time time_stamp() const { return time_stamp_; }
+
   inline const typename CloudProjection::ConstPtr projection_ptr() const {
     return _projection;
   }
@@ -128,6 +134,7 @@ class Cloud {
  protected:
   RichPoint::AlignedVector _points;
   std::string _frame_id;
+  ros::Time time_stamp_;
 
   Pose _pose;
   Pose _sensor_pose;

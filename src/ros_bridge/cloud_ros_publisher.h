@@ -38,6 +38,7 @@ class CloudRosPublisher
   ros::NodeHandle* _node_handle;
   std::string _frame_id, _topic_clouds;
   ros::Publisher _cloud_pub;
+  ros::Time time_stamp_;
 };
 
 }

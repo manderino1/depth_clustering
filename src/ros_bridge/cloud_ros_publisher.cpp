@@ -14,7 +14,9 @@ void CloudRosPublisher::OnNewObjectReceived(const Cloud& cloud, const int id){
   PointCloudT pcl_temp;
   auto cloud_ground_removed = cloud.FromImageLuminar(cloud.projection_ptr()->depth_image());
   //PublishCloud(*(cloud.ToPcl()));
-  PublishCloud(*cloud_ground_removed->ToPcl());
+  auto cloud_pcl = *cloud_ground_removed->ToPcl();
+  time_stamp_ = cloud.time_stamp();
+  PublishCloud(cloud_pcl);
 }
 
 
@@ -22,7 +24,7 @@ void CloudRosPublisher::OnNewObjectReceived(const Cloud& cloud, const int id){
     sensor_msgs::PointCloud2 cloud2;
     pcl::toROSMsg(pcl_cloud, cloud2);
     cloud2.header.frame_id = _frame_id;
-    cloud2.header.stamp = ros::Time::now();
+    cloud2.header.stamp = time_stamp_;
     _cloud_pub.publish(cloud2);
   }
 

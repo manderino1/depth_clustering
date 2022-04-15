@@ -117,6 +117,7 @@ void CloudOdomRosSubscriber::Callback(const PointCloud2::ConstPtr& msg_cloud,
   Cloud::Ptr cloud_ptr = RosCloudToCloud(msg_cloud);
   cloud_ptr->SetPose(RosOdomToPose(msg_odom));
   cloud_ptr->InitProjection(_params);
+  cloud_ptr->SetTimeStamp(msg_cloud->header.stamp);
   ShareDataWithAllClients(*cloud_ptr);
 }
 
@@ -125,6 +126,7 @@ void CloudOdomRosSubscriber::CallbackVelodyne(
   // PrintMsgStats(msg_cloud);
   Cloud::Ptr cloud_ptr = RosCloudToCloud(msg_cloud);
   cloud_ptr->InitProjection(_params);
+  cloud_ptr->SetTimeStamp(msg_cloud->header.stamp);
   ShareDataWithAllClients(*cloud_ptr);
 }
 

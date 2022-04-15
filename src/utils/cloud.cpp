@@ -102,6 +102,8 @@ Cloud::Ptr Cloud::FromImage(const cv::Mat& image,
 Cloud::Ptr Cloud::FromImageLuminar(const cv::Mat& image) const {
   auto projection_luminar = dynamic_cast<LuminarProjection&>(*_projection);
   Cloud cloud;
+  cloud.time_stamp_ = this->time_stamp_;
+  cloud._frame_id = this->_frame_id;
   for (int r = 0; r < image.rows; ++r) {
     for (int c = 0; c < image.cols; ++c) {
       if (image.at<float>(r, c) < 0.0001f) {
@@ -124,6 +126,7 @@ typename pcl::PointCloud<pcl::PointXYZL>::Ptr Cloud::ToPcl() const {
   using PclCloud = pcl::PointCloud<PointXYZL>;
   PclCloud pcl_cloud;
   pcl_cloud.header.frame_id = _frame_id;
+  pcl_conversions::toPCL(time_stamp_, pcl_cloud.header.stamp);
   for (const auto& point : _points) {
     PointXYZL pcl_point;
     pcl_point.x = point.x();
