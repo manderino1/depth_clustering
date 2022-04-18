@@ -110,7 +110,9 @@ Cloud::Ptr Cloud::FromImageLuminar(const cv::Mat& image) const {
         continue;
       }
       // Point is present, add it to the cloud
-      RichPoint point = this->at(projection_luminar.depth_image_indexes().at<int>(r,c));
+      int index = projection_luminar.depth_image_indexes().at<int>(r,c);
+      RichPoint point = this->at(index);
+      point.setIndex(index);
       cloud.push_back(point);
     }
   }
@@ -132,7 +134,7 @@ typename pcl::PointCloud<pcl::PointXYZL>::Ptr Cloud::ToPcl() const {
     pcl_point.x = point.x();
     pcl_point.y = point.y();
     pcl_point.z = point.z();
-    pcl_point.label = point.ring();
+    pcl_point.label = point.index(); // Set original cloud index
     pcl_cloud.push_back(pcl_point);
   }
   return make_shared<PclCloud>(pcl_cloud);

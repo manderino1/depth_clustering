@@ -43,7 +43,10 @@ class RichPoint {
   explicit RichPoint(Eigen::Vector3f& eigen_vec) : _point(eigen_vec) {}
   ~RichPoint() {}
 
+  inline void setIndex(uint32_t index) {_index = index;}
+
   inline int ring() const { return _ring; }
+  inline uint32_t index() const {return _index;}
   inline float x() const { return _point.x(); }
   inline float y() const { return _point.y(); }
   inline float z() const { return _point.z(); }
@@ -71,6 +74,7 @@ class RichPoint {
 
  private:
   Eigen::Vector3f _point = Eigen::Vector3f::Zero();
+  uint32_t _index = 0;
   uint16_t _ring = 0;
 };
 
