@@ -25,6 +25,7 @@ void CloudRosPublisher::OnNewObjectReceived(const Cloud& cloud, const int id){
     pcl::toROSMsg(pcl_cloud, cloud2);
     cloud2.header.frame_id = _frame_id;
     cloud2.header.stamp = time_stamp_;
+    cloud2.fields[3].name = "idx";
     _cloud_pub.publish(cloud2);
   }
 
