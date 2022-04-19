@@ -44,46 +44,11 @@ using namespace depth_clustering;
 using ClustererT = ImageBasedClusterer<LinearImageLabeler<>>;
 
 int main(int argc, char* argv[]) {
-  TCLAP::CmdLine cmd(
-      "Subscribe to /velodyne_points topic and show clustering on the data.",
-      ' ', "1.0");
-  TCLAP::ValueArg<int> angle_arg(
-      "", "angle",
-      "Threshold angle. Below this value, the objects are separated", false, 10,
-      "int");
-  TCLAP::ValueArg<int> num_beams_arg(
-      "", "num_beams", "Num of vertical beams in laser. One of: [16, 32, 64].",
-      true, 0, "int");
-
-  cmd.add(angle_arg);
-  cmd.add(num_beams_arg);
-  cmd.parse(argc, argv);
-
-  Radians angle_tollerance = Radians::FromDegrees(angle_arg.getValue());
-
   std::unique_ptr<ProjectionParams> proj_params_ptr = nullptr;
-  switch (num_beams_arg.getValue()) {
-    case 16:
-      proj_params_ptr = ProjectionParams::VLP_16();
-      break;
-    case 32:
-      proj_params_ptr = ProjectionParams::LUMINAR();
-      break;
-    case 64:
-      proj_params_ptr = ProjectionParams::HDL_64();
-      break;
-  }
-  if (!proj_params_ptr) {
-    fprintf(stderr,
-            "ERROR: wrong number of beams: %d. Should be in [16, 32, 64].\n",
-            num_beams_arg.getValue());
-    exit(1);
-  }
-
-  QApplication application(argc, argv);
+  proj_params_ptr = ProjectionParams::LUMINAR();
 
   ros::init(argc, argv, "show_objects_node");
-  ros::NodeHandle nh;
+  ros::NodeHandle nh("~");
 
   string topic_cloud_front = "/luminar_front_points";
   string topic_cloud_left = "/luminar_left_points";
@@ -92,31 +57,42 @@ int main(int argc, char* argv[]) {
   CloudOdomRosSubscriber subscriber_front(&nh, *proj_params_ptr, topic_cloud_front);
   CloudOdomRosSubscriber subscriber_left(&nh, *proj_params_ptr, topic_cloud_left);
   CloudOdomRosSubscriber subscriber_right(&nh, *proj_params_ptr, topic_cloud_right);
-  Visualizer visualizer;
-  //visualizer.show();
 
-  int min_cluster_size = 20;
-  int max_cluster_size = 100000;
+  int smooth_window_size_front;
+  int smooth_window_size_left;
+  int smooth_window_size_right;
 
-  int smooth_window_size_front = 7;
-  int smooth_window_size_left = 7;
-  int smooth_window_size_right = 7;
+  double ground_remove_angle_front;
+  double ground_remove_angle_left;
+  double ground_remove_angle_right;
 
-  Radians ground_remove_angle_front = 18_deg;
-  Radians ground_remove_angle_left = 18_deg;
-  Radians ground_remove_angle_right = 18_deg;
+  nh.param("smooth_window_size_front", smooth_window_size_front, 5);
+  nh.param("smooth_window_size_left", smooth_window_size_left, 5);
+  nh.param("smooth_window_size_right", smooth_window_size_right, 5);
+
+  nh.param("ground_remove_angle_front", ground_remove_angle_front, 20.0);
+  nh.param("ground_remove_angle_left", ground_remove_angle_left, 20.0);
+  nh.param("ground_remove_angle_right", ground_remove_angle_right, 20.0);
+
+  ROS_INFO("Smooth Window Size Front %i", smooth_window_size_front);
+  ROS_INFO("Smooth Window Size Left %i", smooth_window_size_left);
+  ROS_INFO("Smooth Window Size Right %i", smooth_window_size_right);
+  ROS_INFO("Ground Remove Angle Front %f", ground_remove_angle_front);
+  ROS_INFO("Ground Remove Angle Left %f", ground_remove_angle_left);
+  ROS_INFO("Ground Remove Angle Right %f", ground_remove_angle_right);
+
 
   auto depth_ground_remover_front = DepthGroundRemover(
-      *proj_params_ptr, ground_remove_angle_front, smooth_window_size_front);
+      *proj_params_ptr, Radians::FromDegrees(ground_remove_angle_front), smooth_window_size_front);
   auto depth_ground_remover_left = DepthGroundRemover(
-      *proj_params_ptr, ground_remove_angle_left, smooth_window_size_left);
+      *proj_params_ptr, Radians::FromDegrees(ground_remove_angle_left), smooth_window_size_left);
   auto depth_ground_remover_right = DepthGroundRemover(
-      *proj_params_ptr, ground_remove_angle_right, smooth_window_size_right);
+      *proj_params_ptr, Radians::FromDegrees(ground_remove_angle_right), smooth_window_size_right);
 
   // Create publisher for ground removed cloud, clustered cloud
-  CloudRosPublisher cloud_publisher_front(&nh, "luminar_front", "luminar_front_points/ground_removed");
-  CloudRosPublisher cloud_publisher_left(&nh, "luminar_left", "luminar_left_points/ground_removed");
-  CloudRosPublisher cloud_publisher_right(&nh, "luminar_right", "luminar_right_points/ground_removed");
+  CloudRosPublisher cloud_publisher_front(&nh, "luminar_front", "/luminar_front_points/ground_removed");
+  CloudRosPublisher cloud_publisher_left(&nh, "luminar_left", "/luminar_left_points/ground_removed");
+  CloudRosPublisher cloud_publisher_right(&nh, "luminar_right", "/luminar_right_points/ground_removed");
 
   // Subscribe clouds
   subscriber_front.AddClient(&depth_ground_remover_front);
@@ -128,18 +104,13 @@ int main(int argc, char* argv[]) {
   depth_ground_remover_left.AddClient(&cloud_publisher_left);
   depth_ground_remover_right.AddClient(&cloud_publisher_right);
 
-  fprintf(stderr, "INFO: Running with angle tollerance: %f degrees\n",
-          angle_tollerance.ToDegrees());
-
   subscriber_front.StartListeningToRos();
   subscriber_left.StartListeningToRos();
   subscriber_right.StartListeningToRos();
   ros::AsyncSpinner spinner(3);
   spinner.start();
 
-  auto exit_code = application.exec();
-
   // if we close application, still wait for ros to shutdown
   ros::waitForShutdown();
-  return exit_code;
+  return 0;
 }

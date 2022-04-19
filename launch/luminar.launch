@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="depth_clustering" type="show_objects_multiple_node_ind" name="show_objects_multiple_node_ind" output="screen">
+        <rosparam command="load" file="$(find depth_clustering)/config/luminar.yaml"/>
+    </node>
+</launch>
