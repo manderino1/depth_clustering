@@ -111,6 +111,9 @@ Cloud::Ptr Cloud::FromImageLuminar(const cv::Mat& image) const {
       }
       // Point is present, add it to the cloud
       int index = projection_luminar.depth_image_indexes().at<int>(r,c);
+      if(index == -1) {
+        continue;
+      }
       RichPoint point = this->at(index);
       point.setIndex(index);
       cloud.push_back(point);
