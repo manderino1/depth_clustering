@@ -47,7 +47,9 @@ void LuminarProjection::InitFromPoints(const RichPoint::AlignedVector& points) {
     this->_data[bin_cols][bin_rows].points().push_back(index);
     auto& current_written_depth =
         this->_depth_image.at<float>(bin_rows, bin_cols);
-    if (current_written_depth < dist_to_sensor) {
+    auto& current_index =
+        this->depth_image_indexes_.at<int>(bin_rows, bin_cols);
+    if (current_written_depth < 0.01f || (current_index != -1 && points.at(current_index).intensity() < point.intensity())) {
       // write this point to the image only if it is closer
       current_written_depth = dist_to_sensor;
       // write index

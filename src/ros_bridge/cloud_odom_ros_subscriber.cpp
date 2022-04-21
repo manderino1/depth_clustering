@@ -144,6 +144,7 @@ Cloud::Ptr CloudOdomRosSubscriber::RosCloudToCloud(
   uint32_t x_offset = msg->fields[0].offset;
   uint32_t y_offset = msg->fields[1].offset;
   uint32_t z_offset = msg->fields[2].offset;
+  uint32_t intensity_offset = msg->fields[3].offset;
   uint32_t ring_offset = msg->fields[4].offset;
 
   // Initialize all ring numbers to not found
@@ -158,6 +159,7 @@ Cloud::Ptr CloudOdomRosSubscriber::RosCloudToCloud(
     point.y() = BytesTo<float>(msg->data, point_start_byte + y_offset);
     point.z() = BytesTo<float>(msg->data, point_start_byte + z_offset);
     //point.ring() = BytesTo<uint16_t>(msg->data, point_start_byte + ring_offset);
+    point.intensity() = BytesTo<float>(msg->data, point_start_byte + intensity_offset);
     point.ring() = BytesTo<float>(msg->data, point_start_byte + ring_offset);
 
     ring_present[point.ring()] = true;

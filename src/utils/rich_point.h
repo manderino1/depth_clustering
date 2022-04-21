@@ -50,11 +50,13 @@ class RichPoint {
   inline float x() const { return _point.x(); }
   inline float y() const { return _point.y(); }
   inline float z() const { return _point.z(); }
+  inline float intensity() const { return _intensity; }
 
   inline uint16_t& ring() { return _ring; }
   inline float& x() { return _point.x(); }
   inline float& y() { return _point.y(); }
   inline float& z() { return _point.z(); }
+  inline float& intensity() { return _intensity; }
 
   inline const Eigen::Vector3f& AsEigenVector() const { return _point; }
   inline Eigen::Vector3f& AsEigenVector() { return _point; }
@@ -76,6 +78,7 @@ class RichPoint {
   Eigen::Vector3f _point = Eigen::Vector3f::Zero();
   uint32_t _index = 0;
   uint16_t _ring = 0;
+  float _intensity = 0;
 };
 
 }  // namespace depth_clustering
