@@ -36,12 +36,13 @@ class RichPoint {
   using AlignedVector =
       std::vector<RichPoint, Eigen::aligned_allocator<RichPoint>>;
 
-  RichPoint() {}
+  RichPoint() = default;
   explicit RichPoint(float x, float y, float z) : _point(x, y, z) {}
   explicit RichPoint(float x, float y, float z, uint16_t ring)
       : _point{x, y, z}, _ring{ring} {}
   explicit RichPoint(Eigen::Vector3f& eigen_vec) : _point(eigen_vec) {}
-  ~RichPoint() {}
+  RichPoint(RichPoint const&) = default;
+  ~RichPoint() = default;
 
   inline void setIndex(uint32_t index) {_index = index;}
 

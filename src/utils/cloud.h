@@ -64,6 +64,8 @@ class Cloud {
 
   virtual ~Cloud() {}
 
+  Cloud& operator=(const Cloud& other) = default;
+
   inline const RichPoint::AlignedVector& points() const { return _points; }
 
   inline Pose& pose() { return _pose; }

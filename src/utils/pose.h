@@ -55,6 +55,8 @@ class Pose : public Eigen::Affine3f {
   explicit Pose(const Eigen::Vector3f& v) : Pose(v(0), v(1), v(2)) {}
 
   explicit Pose(const Eigen::Affine3f& m) : Base(m), _likelihood(1.0) {}
+  
+  Pose(Pose const&) = default;
 
   float x() const { return this->matrix()(0, 3); }
   float y() const { return this->matrix()(1, 3); }
