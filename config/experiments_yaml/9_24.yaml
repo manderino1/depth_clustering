@@ -1,0 +1,21 @@
+####################
+# GROUND REMOVAL
+####################
+
+# SMOOTH WINDOW
+smooth_window_size_front: 9
+smooth_window_size_left: 9
+smooth_window_size_right: 9
+
+# GROUND REMOVAL THRESHOLD
+ground_remove_angle_front: 24
+ground_remove_angle_left: 24
+ground_remove_angle_right: 24
+
+# TOPIC PREFIX
+topic_prefix: "9_24"
+
+
+
+
+

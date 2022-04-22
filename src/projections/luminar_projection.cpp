@@ -30,7 +30,7 @@ cv::Mat& LuminarProjection::depth_image_indexes() { return depth_image_indexes_;
 cv::Mat& LuminarProjection::depth_image_pitch() { return depth_image_pitch_; }
 
 void LuminarProjection::InitFromPoints(const RichPoint::AlignedVector& points) {
-  fprintf(stderr, "Projecting cloud with %lu points\n", points.size());
+  //fprintf(stderr, "Projecting cloud with %lu points\n", points.size());
   time_utils::Timer timer;
   this->CheckCloudAndStorage(points);
   // share ownership of input cloud
@@ -58,7 +58,7 @@ void LuminarProjection::InitFromPoints(const RichPoint::AlignedVector& points) {
   }
 
   calculatePitch(points);
-  fprintf(stderr, "Cloud projected in %lu us\n", timer.measure());
+  //fprintf(stderr, "Cloud projected in %lu us\n", timer.measure());
 }
 
 CloudProjection::Ptr LuminarProjection::Clone() const {

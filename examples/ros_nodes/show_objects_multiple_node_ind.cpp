@@ -66,6 +66,8 @@ int main(int argc, char* argv[]) {
   double ground_remove_angle_left;
   double ground_remove_angle_right;
 
+  std::string topic_prefix;
+
   nh.param("smooth_window_size_front", smooth_window_size_front, 5);
   nh.param("smooth_window_size_left", smooth_window_size_left, 5);
   nh.param("smooth_window_size_right", smooth_window_size_right, 5);
@@ -74,12 +76,15 @@ int main(int argc, char* argv[]) {
   nh.param("ground_remove_angle_left", ground_remove_angle_left, 20.0);
   nh.param("ground_remove_angle_right", ground_remove_angle_right, 20.0);
 
+  nh.param("topic_prefix", topic_prefix, std::string("5_20"));
+
   ROS_INFO("Smooth Window Size Front %i", smooth_window_size_front);
   ROS_INFO("Smooth Window Size Left %i", smooth_window_size_left);
   ROS_INFO("Smooth Window Size Right %i", smooth_window_size_right);
   ROS_INFO("Ground Remove Angle Front %f", ground_remove_angle_front);
   ROS_INFO("Ground Remove Angle Left %f", ground_remove_angle_left);
   ROS_INFO("Ground Remove Angle Right %f", ground_remove_angle_right);
+  ROS_INFO("Topic Prefix %s", topic_prefix.c_str());
 
 
   auto depth_ground_remover_front = DepthGroundRemover(
@@ -90,9 +95,9 @@ int main(int argc, char* argv[]) {
       *proj_params_ptr, Radians::FromDegrees(ground_remove_angle_right), smooth_window_size_right);
 
   // Create publisher for ground removed cloud, clustered cloud
-  CloudRosPublisher cloud_publisher_front(&nh, "luminar_front", "/luminar_front_points/ground_removed");
-  CloudRosPublisher cloud_publisher_left(&nh, "luminar_left", "/luminar_left_points/ground_removed");
-  CloudRosPublisher cloud_publisher_right(&nh, "luminar_right", "/luminar_right_points/ground_removed");
+  CloudRosPublisher cloud_publisher_front(&nh, "luminar_front", "/luminar_front_points/ground_removed/c" + topic_prefix);
+  CloudRosPublisher cloud_publisher_left(&nh, "luminar_left", "/luminar_left_points/ground_removed/c" + topic_prefix);
+  CloudRosPublisher cloud_publisher_right(&nh, "luminar_right", "/luminar_right_points/ground_removed/c" + topic_prefix);
 
   // Subscribe clouds
   subscriber_front.AddClient(&depth_ground_remover_front);
