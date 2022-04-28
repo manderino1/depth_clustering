@@ -28,6 +28,7 @@ namespace depth_clustering {
 
 cv::Mat& LuminarProjection::depth_image_indexes() { return depth_image_indexes_; }
 cv::Mat& LuminarProjection::depth_image_pitch() { return depth_image_pitch_; }
+std::vector<int>& LuminarProjection::multiple_returns() { return multiple_returns_; }
 
 void LuminarProjection::InitFromPoints(const RichPoint::AlignedVector& points) {
   //fprintf(stderr, "Projecting cloud with %lu points\n", points.size());
@@ -52,8 +53,15 @@ void LuminarProjection::InitFromPoints(const RichPoint::AlignedVector& points) {
     if (current_written_depth < 0.01f || (current_index != -1 && points.at(current_index).intensity() < point.intensity())) {
       // write this point to the image only if it is closer
       current_written_depth = dist_to_sensor;
+
+      if(current_index != -1) {
+        multiple_returns_.push_back(current_index);
+      }
+
       // write index
       this->depth_image_indexes_.at<int>(bin_rows, bin_cols) = static_cast<int>(index);
+    } else if(current_index != -1) {
+      multiple_returns_.push_back(index);
     }
   }
 

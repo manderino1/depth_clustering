@@ -27,17 +27,20 @@ class CloudRosPublisher
       : _node_handle{node_handle},
         _frame_id{frame_id},
         _topic_clouds{topic_clouds},
-        _cloud_pub{_node_handle->advertise<PointCloud2>(_topic_clouds, 1)} {}
+        _cloud_pub{_node_handle->advertise<PointCloud2>(_topic_clouds, 1)},
+        _multi_pub{_node_handle->advertise<PointCloud2>(_topic_clouds + "/multiple", 1)}
+        {}
 
   ~CloudRosPublisher() override {}
   void OnNewObjectReceived(const Cloud& cloud, int id) override;
   void PublishCloud(const PointCloudT& pcl_cloud);
-
+  void PublishCloudMultiple(const PointCloudT& pcl_cloud);
 
  protected:
   ros::NodeHandle* _node_handle;
   std::string _frame_id, _topic_clouds;
   ros::Publisher _cloud_pub;
+  ros::Publisher _multi_pub;
   ros::Time time_stamp_;
 };
 

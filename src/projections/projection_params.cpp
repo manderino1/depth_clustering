@@ -207,7 +207,7 @@ std::unique_ptr<ProjectionParams> ProjectionParams::HDL_64() {
 
 std::unique_ptr<ProjectionParams> ProjectionParams::LUMINAR() {
   auto params = ProjectionParams();
-  params.SetSpan(SpanParams(-60_deg, 60_deg, 857),
+  params.SetSpan(SpanParams(-60_deg, 60_deg, 857*2),
                  SpanParams::Direction::HORIZONTAL);
   params.SetSpan(SpanParams(-5.5_deg, 6_deg, 34),
                  SpanParams::Direction::VERTICAL);

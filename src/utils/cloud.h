@@ -115,6 +115,8 @@ class Cloud {
 
   Cloud::Ptr FromImageLuminar(const cv::Mat& image) const;
 
+  Cloud::Ptr MultiReturnLuminar(const cv::Mat& image) const;
+
   static Cloud::Ptr FromImage(const cv::Mat& image,
                               const ProjectionParams& params);
 

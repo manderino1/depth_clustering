@@ -59,6 +59,7 @@ class LuminarProjection : public CloudProjection {
 
   cv::Mat& depth_image_indexes();
   cv::Mat& depth_image_pitch();
+  std::vector<int>& multiple_returns();
 
   inline const cv::Mat* depth_image_indexes_ptr() const {
     return &depth_image_indexes_;
@@ -66,6 +67,10 @@ class LuminarProjection : public CloudProjection {
 
   inline const cv::Mat* depth_image_pitch_ptr() const {
     return &depth_image_pitch_;
+  }
+
+  inline const std::vector<int>* multiple_returns_ptr() const {
+    return &multiple_returns_;
   }
 
  protected:
@@ -90,6 +95,7 @@ class LuminarProjection : public CloudProjection {
 
   cv::Mat depth_image_indexes_;
   cv::Mat depth_image_pitch_;
+  std::vector<int> multiple_returns_;
 };
 
 }  // namespace depth_clustering

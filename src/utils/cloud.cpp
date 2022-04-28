@@ -123,6 +123,25 @@ Cloud::Ptr Cloud::FromImageLuminar(const cv::Mat& image) const {
   return boost::make_shared<Cloud>(cloud);
 }
 
+Cloud::Ptr Cloud::MultiReturnLuminar(const cv::Mat& image) const {
+  auto projection_luminar = dynamic_cast<LuminarProjection&>(*_projection);
+  Cloud cloud;
+  cloud.time_stamp_ = this->time_stamp_;
+  cloud._frame_id = this->_frame_id;
+
+  for(auto& index : projection_luminar.multiple_returns()) {
+    if(index == -1) {
+      continue;
+    }
+
+    RichPoint point = this->at(index);
+    point.setIndex(index);
+    cloud.push_back(point);
+  }
+
+  return boost::make_shared<Cloud>(cloud);
+}
+
 // this code will be only there if we use pcl
 #ifdef PCL_FOUND
 

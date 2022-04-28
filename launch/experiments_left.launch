@@ -1,0 +1,111 @@
+<launch>
+    <arg name="bags_directory" value="/media/ubuntu/Archivio/bags/"/>
+
+    <node pkg="depth_clustering" type="show_objects_multiple_node_ind" name="node_5_15" output="screen">
+        <rosparam command="load" file="$(find depth_clustering)/config/experiments_yaml/5_15.yaml"/>
+    </node>
+    <node pkg="depth_clustering" type="show_objects_multiple_node_ind" name="node_5_18" output="screen">
+        <rosparam command="load" file="$(find depth_clustering)/config/experiments_yaml/5_18.yaml"/>
+    </node>
+    <node pkg="depth_clustering" type="show_objects_multiple_node_ind" name="node_5_21" output="screen">
+        <rosparam command="load" file="$(find depth_clustering)/config/experiments_yaml/5_21.yaml"/>
+    </node>
+    <node pkg="depth_clustering" type="show_objects_multiple_node_ind" name="node_5_24" output="screen">
+        <rosparam command="load" file="$(find depth_clustering)/config/experiments_yaml/5_24.yaml"/>
+    </node>
+    <node pkg="depth_clustering" type="show_objects_multiple_node_ind" name="node_5_27" output="screen">
+        <rosparam command="load" file="$(find depth_clustering)/config/experiments_yaml/5_27.yaml"/>
+    </node>
+
+    <node pkg="depth_clustering" type="show_objects_multiple_node_ind" name="node_7_15" output="screen">
+        <rosparam command="load" file="$(find depth_clustering)/config/experiments_yaml/7_15.yaml"/>
+    </node>
+    <node pkg="depth_clustering" type="show_objects_multiple_node_ind" name="node_7_18" output="screen">
+        <rosparam command="load" file="$(find depth_clustering)/config/experiments_yaml/7_18.yaml"/>
+    </node>
+    <node pkg="depth_clustering" type="show_objects_multiple_node_ind" name="node_7_21" output="screen">
+        <rosparam command="load" file="$(find depth_clustering)/config/experiments_yaml/7_21.yaml"/>
+    </node>
+    <node pkg="depth_clustering" type="show_objects_multiple_node_ind" name="node_7_24" output="screen">
+        <rosparam command="load" file="$(find depth_clustering)/config/experiments_yaml/7_24.yaml"/>
+    </node>
+    <node pkg="depth_clustering" type="show_objects_multiple_node_ind" name="node_7_27" output="screen">
+        <rosparam command="load" file="$(find depth_clustering)/config/experiments_yaml/7_27.yaml"/>
+    </node>
+
+    <node pkg="depth_clustering" type="show_objects_multiple_node_ind" name="node_9_15" output="screen">
+        <rosparam command="load" file="$(find depth_clustering)/config/experiments_yaml/9_15.yaml"/>
+    </node>
+    <node pkg="depth_clustering" type="show_objects_multiple_node_ind" name="node_9_18" output="screen">
+        <rosparam command="load" file="$(find depth_clustering)/config/experiments_yaml/9_18.yaml"/>
+    </node>
+    <node pkg="depth_clustering" type="show_objects_multiple_node_ind" name="node_9_21" output="screen">
+        <rosparam command="load" file="$(find depth_clustering)/config/experiments_yaml/9_21.yaml"/>
+    </node>
+    <node pkg="depth_clustering" type="show_objects_multiple_node_ind" name="node_9_24" output="screen">
+        <rosparam command="load" file="$(find depth_clustering)/config/experiments_yaml/9_24.yaml"/>
+    </node>
+    <node pkg="depth_clustering" type="show_objects_multiple_node_ind" name="node_9_27" output="screen">
+        <rosparam command="load" file="$(find depth_clustering)/config/experiments_yaml/9_27.yaml"/>
+    </node>
+
+    <node pkg="depth_clustering" type="show_objects_multiple_node_ind" name="node_11_15" output="screen">
+        <rosparam command="load" file="$(find depth_clustering)/config/experiments_yaml/11_15.yaml"/>
+    </node>
+    <node pkg="depth_clustering" type="show_objects_multiple_node_ind" name="node_11_18" output="screen">
+        <rosparam command="load" file="$(find depth_clustering)/config/experiments_yaml/11_18.yaml"/>
+    </node>
+    <node pkg="depth_clustering" type="show_objects_multiple_node_ind" name="node_11_21" output="screen">
+        <rosparam command="load" file="$(find depth_clustering)/config/experiments_yaml/11_21.yaml"/>
+    </node>
+    <node pkg="depth_clustering" type="show_objects_multiple_node_ind" name="node_11_24" output="screen">
+        <rosparam command="load" file="$(find depth_clustering)/config/experiments_yaml/11_24.yaml"/>
+    </node>
+    <node pkg="depth_clustering" type="show_objects_multiple_node_ind" name="node_11_27" output="screen">
+        <rosparam command="load" file="$(find depth_clustering)/config/experiments_yaml/11_27.yaml"/>
+    </node>
+
+    <node name="bag_5_15" pkg="rosbag" type="record" args="-O $(arg bags_directory)5_15_left.bag 
+        /luminar_left_points/ground_removed/c5_15"/>
+    <node name="bag_5_18" pkg="rosbag" type="record" args="-O $(arg bags_directory)5_18_left.bag 
+        /luminar_left_points/ground_removed/c5_18"/>
+    <node name="bag_5_21" pkg="rosbag" type="record" args="-O $(arg bags_directory)5_21_left.bag 
+        /luminar_left_points/ground_removed/c5_21"/>
+    <node name="bag_5_24" pkg="rosbag" type="record" args="-O $(arg bags_directory)5_24_left.bag 
+        /luminar_left_points/ground_removed/c5_24"/>
+    <node name="bag_5_27" pkg="rosbag" type="record" args="-O $(arg bags_directory)5_27_left.bag 
+        /luminar_left_points/ground_removed/c5_27"/>
+
+    <node name="bag_7_15" pkg="rosbag" type="record" args="-O $(arg bags_directory)7_15_left.bag 
+        /luminar_left_points/ground_removed/c7_15"/>
+    <node name="bag_7_18" pkg="rosbag" type="record" args="-O $(arg bags_directory)7_18_left.bag 
+        /luminar_left_points/ground_removed/c7_18"/>
+    <node name="bag_7_21" pkg="rosbag" type="record" args="-O $(arg bags_directory)7_21_left.bag 
+        /luminar_left_points/ground_removed/c7_21"/>
+    <node name="bag_7_24" pkg="rosbag" type="record" args="-O $(arg bags_directory)7_24_left.bag 
+        /luminar_left_points/ground_removed/c7_24"/>
+    <node name="bag_7_27" pkg="rosbag" type="record" args="-O $(arg bags_directory)7_27_left.bag 
+        /luminar_left_points/ground_removed/c7_27"/>
+
+    <node name="bag_9_15" pkg="rosbag" type="record" args="-O $(arg bags_directory)9_15_left.bag 
+        /luminar_left_points/ground_removed/c9_15"/>
+    <node name="bag_9_18" pkg="rosbag" type="record" args="-O $(arg bags_directory)9_18_left.bag 
+        /luminar_left_points/ground_removed/c9_18"/>
+    <node name="bag_9_21" pkg="rosbag" type="record" args="-O $(arg bags_directory)9_21_left.bag 
+        /luminar_left_points/ground_removed/c9_21"/>
+    <node name="bag_9_24" pkg="rosbag" type="record" args="-O $(arg bags_directory)9_24_left.bag 
+        /luminar_left_points/ground_removed/c9_24"/>
+    <node name="bag_9_27" pkg="rosbag" type="record" args="-O $(arg bags_directory)9_27_left.bag 
+        /luminar_left_points/ground_removed/c9_27"/>
+
+    <node name="bag_11_15" pkg="rosbag" type="record" args="-O $(arg bags_directory)11_15_left.bag 
+        /luminar_left_points/ground_removed/c11_15"/>
+    <node name="bag_11_18" pkg="rosbag" type="record" args="-O $(arg bags_directory)11_18_left.bag 
+        /luminar_left_points/ground_removed/c11_18"/>
+    <node name="bag_11_21" pkg="rosbag" type="record" args="-O $(arg bags_directory)11_21_left.bag 
+        /luminar_left_points/ground_removed/c11_21"/>
+    <node name="bag_11_24" pkg="rosbag" type="record" args="-O $(arg bags_directory)11_24_left.bag 
+        /luminar_left_points/ground_removed/c11_24"/>
+    <node name="bag_11_27" pkg="rosbag" type="record" args="-O $(arg bags_directory)11_27_left.bag 
+        /luminar_left_points/ground_removed/c11_27"/>
+</launch>
