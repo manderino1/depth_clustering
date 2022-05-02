@@ -66,6 +66,18 @@ int main(int argc, char* argv[]) {
   double ground_remove_angle_left;
   double ground_remove_angle_right;
 
+  double angle_tollerance_front;
+  double angle_tollerance_left;
+  double angle_tollerance_right;
+
+  int min_cluster_size_front;
+  int min_cluster_size_left;
+  int min_cluster_size_right;
+
+  int max_cluster_size_front;
+  int max_cluster_size_left;
+  int max_cluster_size_right;
+
   std::string topic_prefix;
 
   nh.param("smooth_window_size_front", smooth_window_size_front, 5);
@@ -75,6 +87,18 @@ int main(int argc, char* argv[]) {
   nh.param("ground_remove_angle_front", ground_remove_angle_front, 20.0);
   nh.param("ground_remove_angle_left", ground_remove_angle_left, 20.0);
   nh.param("ground_remove_angle_right", ground_remove_angle_right, 20.0);
+
+  nh.param("angle_tollerance_front", angle_tollerance_front, 10.0);
+  nh.param("angle_tollerance_left", angle_tollerance_left, 10.0);
+  nh.param("angle_tollerance_right", angle_tollerance_right, 10.0);
+
+  nh.param("min_cluster_size_front", min_cluster_size_front, 10);
+  nh.param("min_cluster_size_left", min_cluster_size_left, 10);
+  nh.param("min_cluster_size_right", min_cluster_size_right, 10);
+
+  nh.param("max_cluster_size_front", max_cluster_size_front, 20000);
+  nh.param("max_cluster_size_left", max_cluster_size_left, 20000);
+  nh.param("max_cluster_size_right", max_cluster_size_right, 20000);
 
   nh.param("topic_prefix", topic_prefix, std::string("5_20"));
 
@@ -94,10 +118,24 @@ int main(int argc, char* argv[]) {
   auto depth_ground_remover_right = DepthGroundRemover(
       *proj_params_ptr, Radians::FromDegrees(ground_remove_angle_right), smooth_window_size_right);
 
+  ClustererT clusterer_front(Radians::FromDegrees(angle_tollerance_front), min_cluster_size_front, max_cluster_size_front);
+  ClustererT clusterer_left(Radians::FromDegrees(angle_tollerance_left), min_cluster_size_left, max_cluster_size_left);
+  ClustererT clusterer_right(Radians::FromDegrees(angle_tollerance_right), min_cluster_size_right, max_cluster_size_right);
+  // TODO: angles is def option but could fail with custom range image, check its behaviour
+  clusterer_front.SetDiffType(DiffFactory::DiffType::ANGLES);
+  clusterer_left.SetDiffType(DiffFactory::DiffType::ANGLES);
+  clusterer_right.SetDiffType(DiffFactory::DiffType::ANGLES);
+
+
   // Create publisher for ground removed cloud, clustered cloud
   CloudRosPublisher cloud_publisher_front(&nh, "luminar_front", "/luminar_front_points/ground_removed/c" + topic_prefix);
   CloudRosPublisher cloud_publisher_left(&nh, "luminar_left", "/luminar_left_points/ground_removed/c" + topic_prefix);
   CloudRosPublisher cloud_publisher_right(&nh, "luminar_right", "/luminar_right_points/ground_removed/c" + topic_prefix);
+
+  // Create publisher for clustering
+  CloudClusterRosPublisher cluster_publisher_front(&nh, "luminar_front", "/luminar_front_points/clusters/c" + topic_prefix);
+  CloudClusterRosPublisher cluster_publisher_left(&nh, "luminar_left", "/luminar_left_points/clusters/c" + topic_prefix);
+  CloudClusterRosPublisher cluster_publisher_right(&nh, "luminar_right", "/luminar_right_points/clusters/c" + topic_prefix);
 
   // Subscribe clouds
   subscriber_front.AddClient(&depth_ground_remover_front);
@@ -108,6 +146,15 @@ int main(int argc, char* argv[]) {
   depth_ground_remover_front.AddClient(&cloud_publisher_front);
   depth_ground_remover_left.AddClient(&cloud_publisher_left);
   depth_ground_remover_right.AddClient(&cloud_publisher_right);
+
+  depth_ground_remover_front.AddClient(&clusterer_front);
+  depth_ground_remover_left.AddClient(&clusterer_left);
+  depth_ground_remover_right.AddClient(&clusterer_right);
+
+  // Subscribe clustering
+  clusterer_front.AddClient(&cluster_publisher_front);
+  clusterer_left.AddClient(&cluster_publisher_left);
+  clusterer_right.AddClient(&cluster_publisher_right);
 
   subscriber_front.StartListeningToRos();
   subscriber_left.StartListeningToRos();
