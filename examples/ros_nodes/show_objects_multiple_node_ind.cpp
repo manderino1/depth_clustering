@@ -88,9 +88,9 @@ int main(int argc, char* argv[]) {
   nh.param("ground_remove_angle_left", ground_remove_angle_left, 20.0);
   nh.param("ground_remove_angle_right", ground_remove_angle_right, 20.0);
 
-  nh.param("angle_tollerance_front", angle_tollerance_front, 10.0);
-  nh.param("angle_tollerance_left", angle_tollerance_left, 10.0);
-  nh.param("angle_tollerance_right", angle_tollerance_right, 10.0);
+  nh.param("angle_tollerance_front", angle_tollerance_front, 2.0);
+  nh.param("angle_tollerance_left", angle_tollerance_left, 2.0);
+  nh.param("angle_tollerance_right", angle_tollerance_right, 2.0);
 
   nh.param("min_cluster_size_front", min_cluster_size_front, 10);
   nh.param("min_cluster_size_left", min_cluster_size_left, 10);
