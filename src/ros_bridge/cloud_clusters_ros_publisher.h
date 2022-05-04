@@ -3,6 +3,7 @@
 
 #include "communication/abstract_client.h"
 #include "communication/abstract_sender.h"
+#include "image_labelers/abstract_image_labeler.h"
 #include "utils/cloud.h"
 #include <pcl/impl/point_types.hpp>
 #include <pcl/point_cloud.h>
@@ -15,8 +16,8 @@ namespace depth_clustering {
 using sensor_msgs::PointCloud2;
 using sensor_msgs::PointCloud2ConstPtr;
 
-typedef pcl::PointXYZL PointT;
-typedef pcl::PointCloud<PointT> PointCloudT;
+typedef pcl::PointXYZRGBL PointC;
+typedef pcl::PointCloud<PointC> PointCloudC;
 
 class CloudClusterRosPublisher
     : public AbstractClient<std::unordered_map<uint16_t, Cloud>> {
@@ -31,8 +32,8 @@ class CloudClusterRosPublisher
 
   ~CloudClusterRosPublisher() override {}
   void OnNewObjectReceived(const std::unordered_map<uint16_t, Cloud>& clouds, int id) override;
-  void ImageToPcl(const std::unordered_map<uint16_t, Cloud>& clouds, PointCloudT& pcl_cloud);
-  void PublishCloud(const PointCloudT& pcl_cloud);
+  void ImageToPcl(const std::unordered_map<uint16_t, Cloud>& clouds, PointCloudC& pcl_cloud);
+  void PublishCloud(const PointCloudC& pcl_cloud);
 
 
  protected:

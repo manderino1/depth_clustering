@@ -78,6 +78,10 @@ class AbstractImageLabeler {
    */
   static cv::Mat LabelsToColor(const cv::Mat& label_image);
 
+  static const std::array<std::array<int, 3>, 200>& GetRandomColors() {
+    return RANDOM_COLORS;
+  }
+
  protected:
   const cv::Mat* _depth_image_ptr;
   ProjectionParams _params;

@@ -9,22 +9,30 @@ using sensor_msgs::PointCloud2;
 
 void CloudClusterRosPublisher::OnNewObjectReceived(const std::unordered_map<uint16_t, Cloud>& clouds, const int id){
   time_utils::Timer total_timer;
-  PointCloudT pcl_cloud;
+  PointCloudC pcl_cloud;
   ImageToPcl(clouds, pcl_cloud);
   PublishCloud(pcl_cloud);
 }
 
-void CloudClusterRosPublisher::ImageToPcl(const std::unordered_map<uint16_t, Cloud>& clouds, PointCloudT& pcl_cloud) {
+void CloudClusterRosPublisher::ImageToPcl(const std::unordered_map<uint16_t, Cloud>& clouds, PointCloudC& pcl_cloud) {
   int i = 0;
+  auto random_colors = AbstractImageLabeler::GetRandomColors();
   for (const auto& kv : clouds) {
     const auto& cluster = kv.second;
-    PointCloudT pcl_temp;
+    PointCloudC pcl_temp;
     for (const auto& point : cluster.points()) {
-      PointT p;
+      PointC p;
       p.x = point.x();
       p.y = point.y();
       p.z = point.z();
       p.label = kv.first; // it was i, but more usefull kv.first for debuging reasons
+
+      // Set label color
+      auto random_color = random_colors[p.label % random_colors.size()];
+      p.r = random_color[0];
+      p.g = random_color[1];
+      p.b = random_color[2];
+
       pcl_temp.push_back(p);
     }
 
@@ -33,7 +41,7 @@ void CloudClusterRosPublisher::ImageToPcl(const std::unordered_map<uint16_t, Clo
   }
 }
 
-  void CloudClusterRosPublisher::PublishCloud(const PointCloudT& pcl_cloud) {
+  void CloudClusterRosPublisher::PublishCloud(const PointCloudC& pcl_cloud) {
     sensor_msgs::PointCloud2 cloud2;
     pcl::toROSMsg(pcl_cloud, cloud2);
     cloud2.header.frame_id = _frame_id;
