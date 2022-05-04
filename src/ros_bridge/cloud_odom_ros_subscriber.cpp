@@ -174,16 +174,28 @@ Cloud::Ptr CloudOdomRosSubscriber::RosCloudToCloud(
   if(ring_present[0] && ring_present[127]) {
     // Jump is present, find first and last
     // Find max ring
+    int checking_count_max = 0;
     for(int i=0; i<128; i++) {
       if(!ring_present[i]) {
-        max_ring = i-1;
+        checking_count_max++;
+      } else {
+        max_ring = i;
+      }
+
+      if(checking_count_max > 10) {
         break;
       }
     }
     // Find min ring
+    int checking_count_min = 0;
     for(int i=127; i>=0; i--) {
       if(!ring_present[i]) {
-        min_ring = i+1;
+        checking_count_min++;
+      } else {
+        min_ring = i;
+      }
+
+      if(checking_count_min > 10) {
         break;
       }
     }
@@ -212,10 +224,12 @@ Cloud::Ptr CloudOdomRosSubscriber::RosCloudToCloud(
     
     if(min_ring < max_ring) {
       if(point.ring() < min_ring || point.ring() > max_ring) {
+        std::cout << new_point.ring() << std::endl;
         continue;
       }
     } else {
       if(point.ring() < min_ring && point.ring() > max_ring) {
+        std::cout << new_point.ring() << std::endl;
         continue;
       }
     }
