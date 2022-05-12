@@ -7,6 +7,7 @@
 #include "utils/cloud.h"
 #include <pcl/impl/point_types.hpp>
 #include <pcl/point_cloud.h>
+#include <pcl/kdtree/kdtree_flann.h>
 #include <ros/node_handle.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <unordered_map>
