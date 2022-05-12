@@ -38,7 +38,13 @@ void LuminarProjection::InitFromPoints(const RichPoint::AlignedVector& points) {
   for (size_t index = 0; index < points.size(); ++index) {
     const auto& point = points[index];
     float dist_to_sensor = point.DistToSensor2D();
+    // Skip if dist is not present
     if (dist_to_sensor < 0.01f) {
+      continue;
+    }
+    // Skip if intensity is under threshold
+    // TODO: use a parameter for the threshold
+    if (point.intensity() < 0.01) {
       continue;
     }
     auto angle_cols = Radians::FromRadians(atan2(point.y(), point.x()));
