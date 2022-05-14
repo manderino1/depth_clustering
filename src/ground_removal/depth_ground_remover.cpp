@@ -209,18 +209,23 @@ Mat DepthGroundRemover::CreateAngleImageLuminar(const Mat& depth_image, const Cl
       float pitch_1 = projection_luminar->depth_image_pitch_ptr()->at<float>(r-1, c);
       float pitch_2 = projection_luminar->depth_image_pitch_ptr()->at<float>(r, c);
 
-      // Calculate projections
-      float x_1 = depth_image.at<float>(r-1, c) * cos(pitch_1);
-      float y_1 = depth_image.at<float>(r-1, c) * sin(pitch_1);
-      float x_2 = depth_image.at<float>(r, c) * cos(pitch_2);
-      float y_2 = depth_image.at<float>(r, c) * sin(pitch_2);
+      if(depth_image.at<float>(r, c) == 0 || depth_image.at<float>(r-1, c) == 0) {
+        angle_image.at<float>(r, c) = 0;
+      } else {
+        // Calculate projections
+        float x_1 = depth_image.at<float>(r-1, c) * cos(pitch_1);
+        float y_1 = depth_image.at<float>(r-1, c) * sin(pitch_1);
+        float x_2 = depth_image.at<float>(r, c) * cos(pitch_2);
+        float y_2 = depth_image.at<float>(r, c) * sin(pitch_2);
 
-      dx = fabs(x_2 - x_1);
-      dy = fabs(y_2 - y_1);
+        dx = fabs(x_2 - x_1);
+        dy = fabs(y_2 - y_1);
 
-      angle_image.at<float>(r, c) = atan2(dy, dx);
+        angle_image.at<float>(r, c) = atan2(dy, dx);
+      }
     }
   }
+
   return angle_image;
 }
 
