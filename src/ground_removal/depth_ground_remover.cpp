@@ -57,8 +57,9 @@ void DepthGroundRemover::OnNewObjectReceived(const Cloud& cloud, const int) {
   //                                        _ground_remove_angle, _window_size);
   // Not using smoothing kernel
   auto no_ground_image = ZeroOutGround(depth_image, smoothed_image, _ground_remove_angle);
+  auto no_ground_image_repaired = RepairDepthHorizontal(no_ground_image, 5, 10.0);
   //fprintf(stderr, "INFO: Ground removed in %lu us\n", total_timer.measure());
-  cloud_copy.projection_ptr()->depth_image() = no_ground_image;
+  cloud_copy.projection_ptr()->depth_image() = no_ground_image_repaired;
   cloud_copy.SetFrameId(cloud.frame_id()); // Copy frame id
   cloud_copy.SetTimeStamp(cloud.time_stamp()); // Copy timestamp
   this->ShareDataWithAllClients(cloud_copy);
@@ -339,6 +340,42 @@ Radians DepthGroundRemover::GetLineAngle(const Mat& depth_image, int col,
   auto dy = fabs(y_current - y_neighbor);
   auto angle = Radians::FromRadians(std::atan2(dy, dx));
   return angle;
+}
+
+cv::Mat DepthGroundRemover::RepairDepthHorizontal(
+    const cv::Mat& no_ground_image, int step,
+    float depth_threshold) const {
+  Mat inpainted_depth = no_ground_image.clone();
+  for (int r = 0; r < inpainted_depth.rows; ++r) {
+    for (int c = 0; c < inpainted_depth.cols; ++c) {
+      float& curr_depth = inpainted_depth.at<float>(r, c);
+      if (curr_depth < 0.001f) {
+        int counter = 0;
+        float sum = 0.0f;
+        for (int i = 1; i < step; ++i) {
+          if (r - i < 0) {
+            continue;
+          }
+          for (int j = 1; j < step; ++j) {
+            if (r + j > inpainted_depth.cols - 1) {
+              continue;
+            }
+            const float& prev = inpainted_depth.at<float>(r, c - i);
+            const float& next = inpainted_depth.at<float>(r, c + j);
+            if (prev > 0.001f && next > 0.001f &&
+                fabs(prev - next) < depth_threshold) {
+              sum += prev + next;
+              counter += 2;
+            }
+          }
+        }
+        if (counter > 0) {
+          curr_depth = sum / counter;
+        }
+      }
+    }
+  }
+  return inpainted_depth;
 }
 
 }  // namespace depth_clustering

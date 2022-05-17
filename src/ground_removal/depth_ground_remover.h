@@ -83,6 +83,9 @@ class DepthGroundRemover : public AbstractClient<Cloud>,
   cv::Mat ZeroOutGroundBFS(const cv::Mat& image, const cv::Mat& angle_image,
                            const Radians& threshold, int kernel_size) const;
 
+  cv::Mat RepairDepthHorizontal(const cv::Mat& no_ground_image, int step,
+                                float depth_threshold) const;
+
   /**
    * @brief      create a help image with angle in radians written for each
    *             pixel
