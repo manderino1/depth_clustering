@@ -44,6 +44,7 @@ class DiffFactory {
 
   static std::unique_ptr<AbstractDiff> Build(
       DiffType type, const cv::Mat* source_image,
+      const cv::Mat* pitch_matrix = nullptr,
       const ProjectionParams* params = nullptr) {
     switch (type) {
       case DiffType::SIMPLE: {
@@ -52,7 +53,7 @@ class DiffFactory {
       }
       case DiffType::ANGLES: {
         return std::unique_ptr<AbstractDiff>(
-            new AngleDiff(source_image, params));
+            new AngleDiff(source_image, pitch_matrix, params));
         break;
       }
       case DiffType::ANGLES_PRECOMPUTED: {

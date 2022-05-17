@@ -39,6 +39,8 @@ namespace depth_clustering {
  */
 template <int16_t STEP_ROW = 1, int16_t STEP_COL = 1>
 class LinearImageLabeler : public AbstractImageLabeler {
+ private:
+  const cv::Mat* pitch_matrix_ptr_;
  public:
   static constexpr int16_t NEIGH_SIZE = 2 * STEP_ROW + 2 * STEP_COL;
   std::array<PixelCoord, NEIGH_SIZE> Neighborhood;
@@ -51,9 +53,11 @@ class LinearImageLabeler : public AbstractImageLabeler {
    * @param[in]  angle_threshold  The angle threshold to seaparate clusters
    */
   explicit LinearImageLabeler(const cv::Mat& depth_image,
+                              const cv::Mat* pitch_matrix,
                               const ProjectionParams& params,
                               const Radians& angle_threshold)
-      : AbstractImageLabeler(depth_image, params, angle_threshold) {
+      : AbstractImageLabeler(depth_image, params, angle_threshold),
+        pitch_matrix_ptr_(pitch_matrix){
     // this can probably be done at compile time
     int16_t counter = 0;
     for (int16_t r = STEP_ROW; r > 0; --r) {
@@ -175,7 +179,7 @@ class LinearImageLabeler : public AbstractImageLabeler {
     _label_image =
         cv::Mat::zeros(_depth_image_ptr->size(), cv::DataType<uint16_t>::type);
     auto diff_helper_ptr =
-        DiffFactory::Build(diff_type, _depth_image_ptr, &_params);
+        DiffFactory::Build(diff_type, _depth_image_ptr, pitch_matrix_ptr_, &_params);
     // initialize the label
     uint16_t label = 1;
 

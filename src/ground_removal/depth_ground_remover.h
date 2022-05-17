@@ -81,6 +81,7 @@ class DepthGroundRemover : public AbstractClient<Cloud>,
                         const Radians& threshold) const;
 
   cv::Mat ZeroOutGroundBFS(const cv::Mat& image, const cv::Mat& angle_image,
+                           const cv::Mat* pitch_matrix,
                            const Radians& threshold, int kernel_size) const;
 
   cv::Mat RepairDepthHorizontal(const cv::Mat& no_ground_image, int step,

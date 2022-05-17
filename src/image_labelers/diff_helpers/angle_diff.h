@@ -38,9 +38,10 @@ class AngleDiff : public AbstractDiff {
    * @brief      Precompute the angles to avoid losing time on that.
    *
    * @param[in]  source_image  The source image
+   * @param[in]  pitch_matrix  The pitch matrix
    * @param[in]  params        The projection parameters
    */
-  AngleDiff(const cv::Mat* source_image, const ProjectionParams* params);
+  AngleDiff(const cv::Mat* source_image, const cv::Mat* pitch_matrix, const ProjectionParams* params);
 
   /**
    * @brief      Compute angle-based difference. See paper for details.
@@ -85,8 +86,8 @@ class AngleDiff : public AbstractDiff {
                      const PixelCoord& neighbor) const;
 
   const ProjectionParams* _params = nullptr;
-  std::vector<float> _row_alphas;
   std::vector<float> _col_alphas;
+  const cv::Mat* pitch_matrix_ptr_;
 };
 
 /**
@@ -168,6 +169,7 @@ class AngleDiffPrecomputed : public AbstractDiff {
   std::vector<float> _col_alphas;
   cv::Mat _beta_rows;
   cv::Mat _beta_cols;
+  const cv::Mat* pitch_matrix_ptr_;
 };
 
 }  // namespace depth_clustering

@@ -101,7 +101,9 @@ class ImageBasedClusterer : public AbstractClusterer {
       return;
     }
     time_utils::Timer timer;
+    auto projection_luminar = dynamic_cast<const LuminarProjection*>(cloud.projection_c_ptr());
     LabelerT image_labeler(cloud.projection_ptr()->depth_image(),
+                           projection_luminar->depth_image_pitch_ptr(),
                            cloud.projection_ptr()->params(), _angle_tollerance);
     image_labeler.ComputeLabels(_diff_type);
     const cv::Mat* labels_ptr = image_labeler.GetLabelImage();

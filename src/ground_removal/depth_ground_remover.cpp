@@ -85,10 +85,11 @@ Mat DepthGroundRemover::ZeroOutGround(const cv::Mat& image,
 
 Mat DepthGroundRemover::ZeroOutGroundBFS(const cv::Mat& image,
                                          const cv::Mat& angle_image,
+                                         const cv::Mat* pitch_matrix,
                                          const Radians& threshold,
                                          int kernel_size) const {
   Mat res = cv::Mat::zeros(image.size(), CV_32F);
-  LinearImageLabeler<> image_labeler(image, _params, threshold);
+  LinearImageLabeler<> image_labeler(image, pitch_matrix, _params, threshold);
   SimpleDiff simple_diff_helper(&angle_image);
   Radians start_thresh = 30_deg;
   for (int c = 0; c < image.cols; ++c) {
