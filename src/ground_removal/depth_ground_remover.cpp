@@ -18,6 +18,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#define DEBUG_IMAGES
+
 #include "./depth_ground_remover.h"
 
 #include <opencv2/highgui/highgui.hpp>
@@ -58,6 +60,56 @@ void DepthGroundRemover::OnNewObjectReceived(const Cloud& cloud, const int) {
   // Not using smoothing kernel
   auto no_ground_image = ZeroOutGround(depth_image, smoothed_image, _ground_remove_angle);
   auto no_ground_image_repaired = RepairDepthHorizontal(no_ground_image, 5, 10.0);
+
+#ifdef DEBUG_IMAGES
+  auto no_ground_image_repaired_3 = RepairDepthHorizontal(no_ground_image, 3, 10.0);
+  auto no_ground_image_repaired_9 = RepairDepthHorizontal(no_ground_image, 9, 10.0);
+
+  // Printing
+  Mat print_depth = cv::Mat::zeros(cloud.projection_ptr()->depth_image().size(), CV_32F);
+  Mat print = cv::Mat::zeros(cloud.projection_ptr()->depth_image().size(), CV_32F);
+  Mat print_rem_3 = cv::Mat::zeros(cloud.projection_ptr()->depth_image().size(), CV_32F);
+  Mat print_rem_5 = cv::Mat::zeros(cloud.projection_ptr()->depth_image().size(), CV_32F);
+  Mat print_rem_9 = cv::Mat::zeros(cloud.projection_ptr()->depth_image().size(), CV_32F);
+
+  // Find Min and Max For each image
+  double minVal, maxVal;
+  cv::minMaxLoc(cloud.projection_ptr()->depth_image(),&minVal,&maxVal);
+  cloud.projection_ptr()->depth_image().convertTo(print_depth,CV_8UC1,255/(maxVal-minVal),-255*minVal / (maxVal - minVal));
+  applyColorMap(print_depth, print_depth, cv::COLORMAP_JET);
+
+  cv::minMaxLoc(no_ground_image,&minVal,&maxVal);
+  no_ground_image.convertTo(print,CV_8UC1,255/(maxVal-minVal),-255*minVal / (maxVal - minVal));
+  applyColorMap(print, print, cv::COLORMAP_JET);
+
+  cv::minMaxLoc(no_ground_image_repaired_3,&minVal,&maxVal);
+  no_ground_image_repaired_3.convertTo(print_rem_3,CV_8UC1,255/(maxVal-minVal),-255*minVal / (maxVal - minVal));
+  applyColorMap(print_rem_3, print_rem_3, cv::COLORMAP_JET);
+
+  cv::minMaxLoc(no_ground_image_repaired,&minVal,&maxVal);
+  no_ground_image_repaired.convertTo(print_rem_5,CV_8UC1,255/(maxVal-minVal),-255*minVal / (maxVal - minVal));
+  applyColorMap(print_rem_5, print_rem_5, cv::COLORMAP_JET);
+
+  cv::minMaxLoc(no_ground_image_repaired_9,&minVal,&maxVal);
+  no_ground_image_repaired_9.convertTo(print_rem_9,CV_8UC1,255/(maxVal-minVal),-255*minVal / (maxVal - minVal));
+  applyColorMap(print_rem_9, print_rem_9, cv::COLORMAP_JET);
+
+  //cv::flip(print, print, -1);
+  cv::resize(print_depth, print_depth, cv::Size(print_depth.cols*2, print_depth.rows*4));
+  cv::imshow("Range Image", print_depth);
+  cv::resize(print, print, cv::Size(print.cols*2, print.rows*4));
+  cv::imshow("Ground Removed Cloud Before Depth Filling", print);
+  cv::resize(print_rem_3, print_rem_3, cv::Size(print_rem_3.cols*2, print_rem_3.rows*4));
+  cv::imshow("Ground Removed Cloud After Depth Filling, width 3", print_rem_3);
+  cv::resize(print_rem_5, print_rem_5, cv::Size(print_rem_5.cols*2, print_rem_5.rows*4));
+  cv::imshow("Ground Removed Cloud After Depth Filling, width 5", print_rem_5);
+  cv::resize(print_rem_9, print_rem_9, cv::Size(print_rem_9.cols*2, print_rem_9.rows*4));
+  cv::imshow("Ground Removed Cloud Before Depth Filling, width 9", print_rem_9);
+
+  cv::waitKey(1);
+  // End printing
+#endif
+
   //fprintf(stderr, "INFO: Ground removed in %lu us\n", total_timer.measure());
   cloud_copy.projection_ptr()->depth_image() = no_ground_image_repaired;
   cloud_copy.SetFrameId(cloud.frame_id()); // Copy frame id
