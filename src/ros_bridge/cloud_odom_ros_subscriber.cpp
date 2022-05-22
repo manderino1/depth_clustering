@@ -161,6 +161,7 @@ Cloud::Ptr CloudOdomRosSubscriber::RosCloudToCloud(
     //point.ring() = BytesTo<uint16_t>(msg->data, point_start_byte + ring_offset);
     point.intensity() = BytesTo<float>(msg->data, point_start_byte + intensity_offset);
     point.ring() = BytesTo<float>(msg->data, point_start_byte + ring_offset);
+    point.setIndex(counter); // Set Index
 
     ring_present[point.ring()] = true;
 

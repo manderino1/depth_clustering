@@ -30,6 +30,7 @@ void CloudClusterRosPublisher::ImageToPcl(const std::unordered_map<uint16_t, Clo
       p.y = point.y();
       p.z = point.z();
       p.label = kv.first; // it was i, but more usefull kv.first for debuging reasons
+      p.idx = point.index();
 
       // Set label color
       auto random_color = random_colors[p.label % random_colors.size()];
