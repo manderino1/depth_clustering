@@ -18,7 +18,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#define DEBUG_IMAGES
+//#define DEBUG_IMAGES
 
 #include "./depth_ground_remover.h"
 
@@ -59,7 +59,7 @@ void DepthGroundRemover::OnNewObjectReceived(const Cloud& cloud, const int) {
   //                                        _ground_remove_angle, _window_size);
   // Not using smoothing kernel
   auto no_ground_image = ZeroOutGround(depth_image, smoothed_image, _ground_remove_angle);
-  auto no_ground_image_repaired = RepairDepthHorizontal(no_ground_image, 5, 10.0);
+  auto no_ground_image_repaired = RepairDepthHorizontal(no_ground_image, 5, 5.0);
 
 #ifdef DEBUG_IMAGES
   auto no_ground_image_repaired_3 = RepairDepthHorizontal(no_ground_image, 3, 10.0);
@@ -111,7 +111,8 @@ void DepthGroundRemover::OnNewObjectReceived(const Cloud& cloud, const int) {
 #endif
 
   //fprintf(stderr, "INFO: Ground removed in %lu us\n", total_timer.measure());
-  cloud_copy.projection_ptr()->depth_image() = no_ground_image_repaired;
+  cloud_copy.projection_ptr()->depth_image() = no_ground_image;
+  cloud_copy.projection_ptr()->cluster_image() = no_ground_image_repaired;
   cloud_copy.SetFrameId(cloud.frame_id()); // Copy frame id
   cloud_copy.SetTimeStamp(cloud.time_stamp()); // Copy timestamp
   this->ShareDataWithAllClients(cloud_copy);

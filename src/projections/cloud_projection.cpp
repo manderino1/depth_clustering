@@ -101,4 +101,10 @@ const cv::Mat& CloudProjection::depth_image() const {
 
 cv::Mat& CloudProjection::depth_image() { return this->_depth_image; }
 
+const cv::Mat& CloudProjection::cluster_image() const {
+  return this->_cluster_image;
+}
+
+cv::Mat& CloudProjection::cluster_image() { return this->_cluster_image; }
+
 }  // namespace depth_clustering

@@ -77,6 +77,9 @@ class CloudProjection {
     _depth_image = image.clone();
   }
 
+  const cv::Mat& cluster_image() const;
+  cv::Mat& cluster_image();
+
   inline size_t rows() const { return _params.rows(); }
   inline size_t cols() const { return _params.cols(); }
   inline size_t size() const { return _params.size(); }
@@ -137,6 +140,8 @@ class CloudProjection {
   ProjectionParams _params;
 
   cv::Mat _depth_image;
+
+  cv::Mat _cluster_image;
 
   std::vector<float> _corrections;
 };

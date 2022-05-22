@@ -102,7 +102,7 @@ class ImageBasedClusterer : public AbstractClusterer {
     }
     time_utils::Timer timer;
     auto projection_luminar = dynamic_cast<const LuminarProjection*>(cloud.projection_c_ptr());
-    LabelerT image_labeler(cloud.projection_ptr()->depth_image(),
+    LabelerT image_labeler(cloud.projection_ptr()->cluster_image(),
                            projection_luminar->depth_image_pitch_ptr(),
                            cloud.projection_ptr()->params(), _angle_tollerance);
     image_labeler.ComputeLabels(_diff_type);
@@ -132,6 +132,9 @@ class ImageBasedClusterer : public AbstractClusterer {
           // this is a default label, skip
           continue;
         }
+        if(cloud.projection_ptr()->depth_image().at<float>(row, col) < 0.01f) {
+          continue;
+        }
         for (const auto& point_idx : point_container.points()) {
           const auto& point = cloud.points()[point_idx];
           clusters[label].push_back(point);
@@ -150,6 +153,12 @@ class ImageBasedClusterer : public AbstractClusterer {
     }
     for (auto label : labels_to_erase) {
       clusters.erase(label);
+    }
+
+    // Set timestamps
+    for (auto& it: clusters) {
+      // Do stuff
+      it.second.SetTimeStamp(cloud.time_stamp());
     }
 
     fprintf(stderr, "INFO: prepared clusters in: %lu us\n", timer.measure());

@@ -8,6 +8,10 @@ namespace depth_clustering {
 using sensor_msgs::PointCloud2;
 
 void CloudClusterRosPublisher::OnNewObjectReceived(const std::unordered_map<uint16_t, Cloud>& clouds, const int id){
+  if(!clouds.empty()) {
+    time_stamp_ = clouds.begin()->second.time_stamp();
+  }
+
   time_utils::Timer total_timer;
   PointCloudC pcl_cloud;
   ImageToPcl(clouds, pcl_cloud);
@@ -45,7 +49,7 @@ void CloudClusterRosPublisher::ImageToPcl(const std::unordered_map<uint16_t, Clo
     sensor_msgs::PointCloud2 cloud2;
     pcl::toROSMsg(pcl_cloud, cloud2);
     cloud2.header.frame_id = _frame_id;
-    cloud2.header.stamp = ros::Time::now(); // TODO: Set output time stamp as original cluster stamp
+    cloud2.header.stamp = time_stamp_; // TODO: Set output time stamp as original cluster stamp
     _cloud_pub.publish(cloud2);
   }
 
