@@ -134,6 +134,8 @@ class Cloud {
     return make_shared<Cloud>(cloud);
   }
 #endif  // PCL_FOUND
+ public:
+  CloudProjection::Ptr _projection = nullptr;
 
  protected:
   RichPoint::AlignedVector _points;
@@ -143,7 +145,7 @@ class Cloud {
   Pose _pose;
   Pose _sensor_pose;
 
-  CloudProjection::Ptr _projection = nullptr;
+
 };
 
 }  // namespace depth_clustering

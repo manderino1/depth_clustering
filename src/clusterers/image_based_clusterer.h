@@ -122,11 +122,19 @@ class ImageBasedClusterer : public AbstractClusterer {
     std::unordered_map<uint16_t, Cloud> clusters;
     for (int row = 0; row < labels_ptr->rows; ++row) {
       for (int col = 0; col < labels_ptr->cols; ++col) {
+        /*
         const auto& point_container = cloud.projection_ptr()->at(row, col);
         if (point_container.IsEmpty()) {
           // this is ok, just continue, nothing interesting here, no points.
           continue;
         }
+         */
+        int index = projection_luminar->depth_image_indexes_ptr()->template at<int>(row,col);
+        if(index == -1) {
+          continue;
+        }
+        RichPoint point = cloud.points()[index];
+
         uint16_t label = labels_ptr->at<uint16_t>(row, col);
         if (label < 1) {
           // this is a default label, skip
@@ -135,10 +143,7 @@ class ImageBasedClusterer : public AbstractClusterer {
         if(cloud.projection_ptr()->depth_image().at<float>(row, col) < 0.01f) {
           continue;
         }
-        for (const auto& point_idx : point_container.points()) {
-          const auto& point = cloud.points()[point_idx];
-          clusters[label].push_back(point);
-        }
+        clusters[label].push_back(point);
       }
     }
 
@@ -159,6 +164,7 @@ class ImageBasedClusterer : public AbstractClusterer {
     for (auto& it: clusters) {
       // Do stuff
       it.second.SetTimeStamp(cloud.time_stamp());
+      it.second.SetProjectionPtr(cloud._projection);
     }
 
     fprintf(stderr, "INFO: prepared clusters in: %lu us\n", timer.measure());

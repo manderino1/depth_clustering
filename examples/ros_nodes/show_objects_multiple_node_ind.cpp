@@ -122,9 +122,9 @@ int main(int argc, char* argv[]) {
   ClustererT clusterer_left(Radians::FromDegrees(angle_tollerance_left), min_cluster_size_left, max_cluster_size_left);
   ClustererT clusterer_right(Radians::FromDegrees(angle_tollerance_right), min_cluster_size_right, max_cluster_size_right);
   // TODO: angles is def option but could fail with custom range image, check its behaviour
-  clusterer_front.SetDiffType(DiffFactory::DiffType::ANGLES);
-  clusterer_left.SetDiffType(DiffFactory::DiffType::ANGLES);
-  clusterer_right.SetDiffType(DiffFactory::DiffType::ANGLES);
+  clusterer_front.SetDiffType(DiffFactory::DiffType::LINE_DIST);
+  clusterer_left.SetDiffType(DiffFactory::DiffType::LINE_DIST);
+  clusterer_right.SetDiffType(DiffFactory::DiffType::LINE_DIST);
 
 
   // Create publisher for ground removed cloud, clustered cloud

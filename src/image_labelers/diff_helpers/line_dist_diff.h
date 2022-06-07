@@ -41,9 +41,10 @@ class LineDistDiff : public AbstractDiff {
    * @brief      Precompute the line distances to avoid losing time on that.
    *
    * @param[in]  source_image  The source image
+   * @param[in]  pitch_matrix  The pitch matrix
    * @param[in]  params        The projection parameters
    */
-  LineDistDiff(const cv::Mat* source_image, const ProjectionParams* params);
+  LineDistDiff(const cv::Mat* source_image, const cv::Mat* pitch_matrix, const ProjectionParams* params);
 
   /**
    * @brief      Compute angle-based difference. See paper for details.
@@ -59,7 +60,7 @@ class LineDistDiff : public AbstractDiff {
    * @brief      Threshold is satisfied if angle is BIGGER than threshold
    */
   inline bool SatisfiesThreshold(float angle, float threshold) const override {
-    return angle > threshold;
+    return angle < 0.5;
   }
 
   /**
@@ -88,8 +89,8 @@ class LineDistDiff : public AbstractDiff {
                      const PixelCoord& neighbor) const;
 
   const ProjectionParams* _params = nullptr;
-  std::vector<float> _row_alphas;
   std::vector<float> _col_alphas;
+  const cv::Mat* pitch_matrix_ptr_;
 };
 
 /**

@@ -63,7 +63,7 @@ class DiffFactory {
       }
       case DiffType::LINE_DIST: {
         return std::unique_ptr<AbstractDiff>(
-            new LineDistDiff(source_image, params));
+            new LineDistDiff(source_image, pitch_matrix, params));
         break;
       }
       case DiffType::LINE_DIST_PRECOMPUTED: {

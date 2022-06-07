@@ -79,8 +79,7 @@ class LinearImageLabeler : public AbstractImageLabeler {
    * @param[in]  start        Start pixel
    * @param[in]  diff_helper  The difference helper
    */
-  void LabelOneComponent(uint16_t label, const PixelCoord& start,
-                         const AbstractDiff* diff_helper) {
+  void LabelOneComponent(uint16_t label, const PixelCoord& start) {
     // breadth first search
     std::queue<PixelCoord> labeling_queue;
     labeling_queue.push(start);
@@ -119,8 +118,8 @@ class LinearImageLabeler : public AbstractImageLabeler {
           // we have already labeled this one
           continue;
         }
-        auto diff = diff_helper->DiffAt(current, neighbor);
-        if (diff_helper->SatisfiesThreshold(diff, _radians_threshold)) {
+        auto diff = DepthAt(current) - DepthAt(neighbor);
+        if (abs(diff) < 0.5) {
           labeling_queue.push(neighbor);
         }
       }
@@ -193,7 +192,7 @@ class LinearImageLabeler : public AbstractImageLabeler {
           // depth is zero, not interested
           continue;
         }
-        LabelOneComponent(label, PixelCoord(row, col), diff_helper_ptr.get());
+        LabelOneComponent(label, PixelCoord(row, col));
         // we have finished labeling this connected component. We now need to
         // label the next one, so we increment the label
         label++;

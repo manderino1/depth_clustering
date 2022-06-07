@@ -26,9 +26,9 @@
 
 namespace depth_clustering {
 
-LineDistDiff::LineDistDiff(const cv::Mat* source_image,
+LineDistDiff::LineDistDiff(const cv::Mat* source_image, const cv::Mat* pitch_matrix,
                            const ProjectionParams* params)
-    : AbstractDiff{source_image}, _params{params} {
+    : AbstractDiff{source_image}, _params{params}, pitch_matrix_ptr_(pitch_matrix) {
   PreComputeAlphaVecs();
 }
 
@@ -48,17 +48,10 @@ float LineDistDiff::DiffAt(const PixelCoord& from, const PixelCoord& to) const {
   float d1 = std::max(current_depth, neighbor_depth);
   float d2 = std::min(current_depth, neighbor_depth);
   float beta = fabs(std::atan2((d2 * sin(alpha)), (d1 - d2 * cos(alpha))));
-  return d1 * sin(beta);
+  return d1-d2;
 }
 
 void LineDistDiff::PreComputeAlphaVecs() {
-  _row_alphas.reserve(_params->rows());
-  for (size_t r = 0; r < _params->rows() - 1; ++r) {
-    _row_alphas.push_back(
-        fabs((_params->AngleFromRow(r + 1) - _params->AngleFromRow(r)).val()));
-  }
-  // add last row alpha
-  _row_alphas.push_back(0.0f);
   // now handle the cols
   _col_alphas.reserve(_params->cols());
   for (size_t c = 0; c < _params->cols() - 1; ++c) {
@@ -83,9 +76,11 @@ float LineDistDiff::ComputeAlpha(const PixelCoord& current,
     return _col_alphas.back();
   }
   if (current.row < neighbor.row) {
-    return _row_alphas[current.row];
+    float alpha = fabs(pitch_matrix_ptr_->at<float>(current.row + 1, current.col) - pitch_matrix_ptr_->at<float>(current.row, current.col));
+    return alpha;
   } else if (current.row > neighbor.row) {
-    return _row_alphas[neighbor.row];
+    float alpha = fabs(pitch_matrix_ptr_->at<float>(neighbor.row + 1, neighbor.col) - pitch_matrix_ptr_->at<float>(neighbor.row, neighbor.col));
+    return alpha;
   } else if (current.col < neighbor.col) {
     return _col_alphas[current.col];
   } else if (current.col > neighbor.col) {
