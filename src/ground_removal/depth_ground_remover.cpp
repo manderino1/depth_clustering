@@ -59,7 +59,7 @@ void DepthGroundRemover::OnNewObjectReceived(const Cloud& cloud, const int) {
   //                                        _ground_remove_angle, _window_size);
   // Not using smoothing kernel
   auto no_ground_image = ZeroOutGround(depth_image, smoothed_image, _ground_remove_angle);
-  auto no_ground_image_repaired = RepairDepthHorizontal(no_ground_image, 5, 5.0);
+  auto no_ground_image_repaired = RepairDepthHorizontal(no_ground_image, 9, 5.0);
 
 #ifdef DEBUG_IMAGES
   auto no_ground_image_repaired_3 = RepairDepthHorizontal(no_ground_image, 3, 10.0);
