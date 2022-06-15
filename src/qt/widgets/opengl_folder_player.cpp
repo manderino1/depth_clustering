@@ -165,7 +165,7 @@ void OpenGlFolderPlayer::OnNewObjectReceived(const cv::Mat &image, int) {
         }
       }
       auto diff_helper_ptr =
-          DiffFactory::Build(diff_type, &image, _proj_params.get());
+          DiffFactory::Build(diff_type, &image, nullptr, nullptr);
       qimage = MatToQImage(diff_helper_ptr->Visualize());
       break;
     }
