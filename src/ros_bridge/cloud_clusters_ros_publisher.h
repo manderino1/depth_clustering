@@ -16,6 +16,7 @@
 #include <ros/node_handle.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <unordered_map>
+#include <geometry_msgs/PoseArray.h>
 
 struct PointXYZRGBLI
 {
@@ -55,7 +56,9 @@ class CloudClusterRosPublisher
       : _node_handle{node_handle},
         _frame_id{frame_id},
         _topic_clouds{topic_clouds},
-        _cloud_pub{_node_handle->advertise<PointCloud2>(_topic_clouds, 1)} {}
+        _cloud_pub{_node_handle->advertise<PointCloud2>(_topic_clouds, 1)},
+        _dim_pub{_node_handle->advertise<geometry_msgs::PoseArray>(_topic_clouds + "/dim", 1)},
+        _points_pub{_node_handle->advertise<geometry_msgs::PoseArray>(_topic_clouds + "/point_dim", 1)}{}
 
   ~CloudClusterRosPublisher() override {}
   void OnNewObjectReceived(const std::unordered_map<uint16_t, Cloud>& clouds, int id) override;
@@ -67,6 +70,8 @@ class CloudClusterRosPublisher
   ros::NodeHandle* _node_handle;
   std::string _frame_id, _topic_clouds;
   ros::Publisher _cloud_pub;
+  ros::Publisher _dim_pub;
+  ros::Publisher _points_pub;
   ros::Time time_stamp_;
 };
 
