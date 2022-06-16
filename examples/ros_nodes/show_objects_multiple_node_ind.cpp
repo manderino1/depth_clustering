@@ -96,9 +96,9 @@ int main(int argc, char* argv[]) {
   nh.param("min_cluster_size_left", min_cluster_size_left, 10);
   nh.param("min_cluster_size_right", min_cluster_size_right, 10);
 
-  nh.param("max_cluster_size_front", max_cluster_size_front, 20000);
-  nh.param("max_cluster_size_left", max_cluster_size_left, 20000);
-  nh.param("max_cluster_size_right", max_cluster_size_right, 20000);
+  nh.param("max_cluster_size_front", max_cluster_size_front, 50000);
+  nh.param("max_cluster_size_left", max_cluster_size_left, 50000);
+  nh.param("max_cluster_size_right", max_cluster_size_right, 50000);
 
   nh.param("topic_prefix", topic_prefix, std::string("5_20"));
 
