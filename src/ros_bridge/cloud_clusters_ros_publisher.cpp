@@ -38,6 +38,12 @@ void CloudClusterRosPublisher::ImageToPcl(const std::unordered_map<uint16_t, Clo
       p.idx = point.index();
       dist_sum += sqrt(pow(p.x, 2) + pow(p.y, 2) + pow(p.z, 2));
 
+      // Set label color
+      auto random_color = random_colors[p.label % random_colors.size()];
+      p.r = random_color[0];
+      p.g = random_color[1];
+      p.b = random_color[2];
+
       pcl_temp.push_back(p);
     }
 
@@ -59,36 +65,36 @@ void CloudClusterRosPublisher::ImageToPcl(const std::unordered_map<uint16_t, Clo
     // Show color depending on cluster type
     double dist_avg = dist_sum / cluster.size();
     double volume = dim.position.x * dim.position.y * dim.position.z;
-    bool car = false;
-    bool other = false;
-    if(dist_avg < 55) {
-      if(volume > 0.6 && volume < 15) {
-        car = true;
-        if(dim.position.x > 6 || dim.position.y > 6) {
-          car = false;
-          other = true;
-        }
-      } else {
-        other = true;
-      }
-    }
+    double area = dim.position.x * dim.position.y;
+
+    // Create feature vector
+    std::vector<double> feature_vector;
+    feature_vector.push_back(dim.position.x);
+    feature_vector.push_back(dim.position.y);
+    feature_vector.push_back(dim.position.z);
+    feature_vector.push_back(pcl_temp.size());
+    feature_vector.push_back(dist_avg);
+    feature_vector.push_back(area);
+    feature_vector.push_back(volume);
+
+    // Classify cluster
+    int target_class = cluster_decision_tree(feature_vector);
+
 
     for (auto& p : pcl_temp) {
       // Set label color
-      if(car) {
+      if(target_class == 0) {
         p.r = 255;
         p.g = 0;
         p.b = 0;
-      } else if(other) {
+      } else if(target_class == 1) {
         p.r = 0;
         p.g = 255;
         p.b = 0;
       }
     }
 
-    if(car || other) {
-      pcl_cloud += pcl_temp;
-    }
+    pcl_cloud += pcl_temp;
     i++;
   }
 

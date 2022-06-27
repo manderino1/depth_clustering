@@ -17,6 +17,7 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <unordered_map>
 #include <geometry_msgs/PoseArray.h>
+#include "cluster_decision_tree.h"
 
 struct PointXYZRGBLI
 {
