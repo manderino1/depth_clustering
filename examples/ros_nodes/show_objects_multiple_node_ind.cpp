@@ -88,17 +88,17 @@ int main(int argc, char* argv[]) {
   nh.param("ground_remove_angle_left", ground_remove_angle_left, 20.0);
   nh.param("ground_remove_angle_right", ground_remove_angle_right, 20.0);
 
-  nh.param("angle_tollerance_front", angle_tollerance_front, 2.0);
-  nh.param("angle_tollerance_left", angle_tollerance_left, 2.0);
-  nh.param("angle_tollerance_right", angle_tollerance_right, 2.0);
+  nh.param("angle_tollerance_front", angle_tollerance_front, 2.5);
+  nh.param("angle_tollerance_left", angle_tollerance_left, 2.5);
+  nh.param("angle_tollerance_right", angle_tollerance_right, 2.5);
 
   nh.param("min_cluster_size_front", min_cluster_size_front, 10);
   nh.param("min_cluster_size_left", min_cluster_size_left, 10);
   nh.param("min_cluster_size_right", min_cluster_size_right, 10);
 
-  nh.param("max_cluster_size_front", max_cluster_size_front, 20000);
-  nh.param("max_cluster_size_left", max_cluster_size_left, 20000);
-  nh.param("max_cluster_size_right", max_cluster_size_right, 20000);
+  nh.param("max_cluster_size_front", max_cluster_size_front, 50000);
+  nh.param("max_cluster_size_left", max_cluster_size_left, 50000);
+  nh.param("max_cluster_size_right", max_cluster_size_right, 50000);
 
   nh.param("topic_prefix", topic_prefix, std::string("5_20"));
 
